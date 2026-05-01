@@ -1,0 +1,54 @@
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="PasswordManager.UI.VaultPage">
+
+    <VerticalStackLayout Padding="20" Spacing="10">
+
+        <Label Text="Your Vault"
+           FontSize="28"
+           HorizontalOptions="Center" />
+
+        <Label x:Name="DebugLabel"
+       Text="Entries: 0"
+       FontSize="14"
+       HorizontalOptions="Center" />
+
+        <Entry x:Name="SiteEntry" Placeholder="Site" />
+        <Entry x:Name="UsernameEntry" Placeholder="Username" />
+        <Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True"/>
+
+        <Button Text="Generate Password"
+        Clicked="OnGenerateClicked" />
+
+        <Button Text="Add Entry"
+        Clicked="OnAddEntryClicked" />
+
+        <CollectionView x:Name="EntriesList" SelectionMode="Single" SelectionChanged="OnEntrySelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="10" Margin="5">
+                        <HorizontalStackLayout>
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Site}" FontAttributes="Bold"/>
+                                <Label Text="{Binding Username}" FontSize="12"/>
+                            </VerticalStackLayout>
+                            <Button Text="View"
+                                Clicked="OnViewEntryClicked" />
+                            <Button Text="Delete"
+                                Clicked="OnEntryDeleted" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <Label Text="No entries yet. Add your first password!" 
+                       FontSize="16" 
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center" />
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+    </VerticalStackLayout>
+
+</ContentPage>

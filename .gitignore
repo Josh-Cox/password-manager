@@ -1,0 +1,83 @@
+########################################
+# Build outputs
+########################################
+bin/
+obj/
+out/
+publish/
+
+########################################
+# User / IDE files
+########################################
+.vs/
+.vscode/
+*.user
+*.suo
+*.userprefs
+*.csproj.user
+
+########################################
+# Logs
+########################################
+*.log
+
+########################################
+# OS files
+########################################
+.DS_Store
+Thumbs.db
+
+########################################
+# NuGet
+########################################
+*.nupkg
+packages/
+# (Keep this if you use PackageReference; remove if using packages.config)
+!packages/build/
+
+########################################
+# Rider / ReSharper
+########################################
+_ReSharper*/
+*.DotSettings.user
+
+########################################
+# Test results
+########################################
+TestResults/
+*.trx
+
+########################################
+# MAUI / Xamarin specifics
+########################################
+# Android
+*.apk
+*.aab
+
+# iOS / Mac
+*.ipa
+
+########################################
+# App secrets / configs
+########################################
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+########################################
+# Azure / publish profiles (IMPORTANT)
+########################################
+Properties/PublishProfiles/
+*.pubxml
+*.publishsettings
+
+########################################
+# Your vault file (VERY IMPORTANT)
+########################################
+vault.dat
+
+########################################
+# Misc
+########################################
+*.cache
+*.tmp
