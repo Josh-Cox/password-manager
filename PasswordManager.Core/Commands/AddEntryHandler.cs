@@ -16,7 +16,7 @@ namespace PasswordManager.Core.Commands
 
         public async Task HandleAsync(AddEntryCommand command)
         {
-            await _app.AddEntryAsync(command.Entry);
+            await _app.AddEntryAsync(command.UserID, command.Entry);
         }
     }
 }

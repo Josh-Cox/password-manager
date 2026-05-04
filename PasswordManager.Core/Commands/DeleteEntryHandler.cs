@@ -16,7 +16,7 @@ namespace PasswordManager.Core.Commands
 
         public async Task HandleAsync(DeleteEntryCommand command)
         {
-            await _app.DeleteEntryAsync(command.Entry);
+            await _app.DeleteEntryAsync(command.UserID, command.Entry);
         }
     }
 }

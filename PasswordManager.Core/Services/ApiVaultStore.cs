@@ -13,21 +13,25 @@ namespace PasswordManager.Core.Services
             _client = client;
         }
 
-        public async Task<byte[]> ReadAllAsync()
+        public async Task<byte[]?> ReadAllAsync(string userId)
         {
-            var response = await _client.GetAsync("/vault");
+            var response = await _client.GetAsync($"/vault/{userId}");
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
             return await response.Content.ReadAsByteArrayAsync();
         }
 
-        public async Task WriteAllAsync(byte[] data)
+        public async Task WriteAllAsync(string userId, byte[] data)
         {
             var content = new ByteArrayContent(data);
-            await _client.PostAsync("/vault", content);
+            await _client.PostAsync($"/vault/{userId}", content);
         }
 
-        public async Task<bool> ExistsAsync()
+        public async Task<bool> ExistsAsync(string userId)
         {
-            var response = await _client.GetAsync("/vault");
+            var response = await _client.GetAsync($"/vault/{userId}");
             return response.IsSuccessStatusCode;
         }
     }

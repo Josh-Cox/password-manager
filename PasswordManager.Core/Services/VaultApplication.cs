@@ -13,9 +13,9 @@ namespace PasswordManager.Core.Services
             _vaultService = vaultService;
         }
 
-        public async Task LoadVaultAsync(string masterPassword)
+        public async Task LoadVaultAsync(string userID, string masterPassword)
         {
-            _session = await _vaultService.LoadAsync(masterPassword);
+            _session = await _vaultService.LoadAsync(userID, masterPassword);
         }
 
         public ObservableCollection<PasswordEntry> GetEntries()
@@ -34,22 +34,22 @@ namespace PasswordManager.Core.Services
             return _session.Entries[index];
         }
 
-        public async Task AddEntryAsync(PasswordEntry entry)
+        public async Task AddEntryAsync(string userID, PasswordEntry entry)
         {
             if (_session == null)
                 throw new InvalidOperationException("Vault not loaded.");
 
             _session.Entries.Add(entry);
-            await _vaultService.SaveAsync(_session);
+            await _vaultService.SaveAsync(userID, _session);
         }
 
-        public async Task DeleteEntryAsync(PasswordEntry entry)
+        public async Task DeleteEntryAsync(string userID, PasswordEntry entry)
         {
             if (_session == null)
                 throw new InvalidOperationException("Vault not loaded.");
 
             _session.Entries.Remove(entry);
-            await _vaultService.SaveAsync(_session);
+            await _vaultService.SaveAsync(userID, _session);
         }
 
         public string GeneratePassword(int length)

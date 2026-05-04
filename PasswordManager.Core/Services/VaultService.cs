@@ -31,7 +31,7 @@ namespace PasswordManager.Core.Services
         private static readonly byte[] Header = Encoding.ASCII.GetBytes("PMGR");
 
 
-        public async Task SaveAsync(VaultSession session)
+        public async Task SaveAsync(string userID, VaultSession session)
         {
             string json = JsonSerializer.Serialize(session.Entries);
 
@@ -48,13 +48,13 @@ namespace PasswordManager.Core.Services
             byte[] fullBytes = _codec.Write(session.Salt, encrypted);
 
             // write to file
-            await _store.WriteAllAsync(fullBytes);
+            await _store.WriteAllAsync(userID, fullBytes);
         }
 
-        public async Task<VaultSession> LoadAsync(string masterPassword)
+        public async Task<VaultSession> LoadAsync(string userID, string masterPassword)
         {
 
-            if (!await _store.ExistsAsync())
+            if (!await _store.ExistsAsync(userID))
             {
 
                 var session = new VaultSession
@@ -65,12 +65,12 @@ namespace PasswordManager.Core.Services
                 };
 
                 // save it immediately
-                SaveAsync(session);
+                await SaveAsync(userID, session);
 
                 return session;
             }
 
-            byte[] fileBytes = await _store.ReadAllAsync();
+            byte[] fileBytes = await _store.ReadAllAsync(userID);
 
             var (salt, encrypted) = _codec.Read(fileBytes);
 

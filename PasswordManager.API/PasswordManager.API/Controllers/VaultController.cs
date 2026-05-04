@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PasswordManager.API.Services;
 
 namespace PasswordManager.API.Controllers
 {
@@ -6,34 +7,33 @@ namespace PasswordManager.API.Controllers
     [Route("vault")]
     public class VaultController : ControllerBase
     {
+        private readonly VaultStorageService _storage;
 
-        [HttpGet]
-        public IActionResult GetVault()
+        public VaultController(VaultStorageService storage)
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "vault.dat");
-            if (!System.IO.File.Exists(path))
-                return NotFound();
+            _storage = storage;
+        }
 
-            var bytes = System.IO.File.ReadAllBytes(path);
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetVault(string userId)
+        {
+            var bytes = await _storage.GetVaultAsync(userId);
+
+            if (bytes == null)
+                return NotFound();
 
             return File(bytes, "application/octet-stream");
         }
 
-        [HttpPost]
-        public async Task<ActionResult> SaveVault()
+        [HttpPost("{userId}")]
+        public async Task<IActionResult> SaveVault(string userId)
         {
-            var path = "vault.dat";
-
             using var ms = new MemoryStream();
             await Request.Body.CopyToAsync(ms);
 
-            var bytes = ms.ToArray();
-
-            System.IO.File.WriteAllBytes(path, bytes);
+            await _storage.SaveVaultAsync(userId, ms.ToArray());
 
             return Ok();
         }
     }
-
-
 }

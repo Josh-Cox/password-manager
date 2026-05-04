@@ -7,10 +7,12 @@ namespace PasswordManager.Core.Commands
 {
     public class DeleteEntryCommand : ICommand
     {
+        public string UserID { get; }
         public PasswordEntry Entry { get; }
 
-        public DeleteEntryCommand(PasswordEntry entry)
+        public DeleteEntryCommand(string userID, PasswordEntry entry)
         {
+            UserID = userID;
             Entry = entry;
         }
     }

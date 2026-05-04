@@ -6,11 +6,13 @@ using PasswordManager.Core.Models;
 namespace PasswordManager.Core.Commands
 {
     public class AddEntryCommand : ICommand
-    {
+    {       
+        public string UserID { get; }
         public PasswordEntry Entry { get; }
 
-        public AddEntryCommand(PasswordEntry entry)
+        public AddEntryCommand(string userID, PasswordEntry entry)
         {
+            UserID = userID;
             Entry = entry;
         }
     }
