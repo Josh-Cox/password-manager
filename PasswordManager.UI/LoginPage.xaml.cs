@@ -2,22 +2,20 @@
 
 namespace PasswordManager.UI;
 
-public partial class MainPage : ContentPage
+public partial class LoginPage : ContentPage
 {
     private readonly AuthService _auth;
     private readonly UserSession _session;
 
-    public MainPage(AuthService auth, UserSession session)
+    public LoginPage(AuthService auth, UserSession session)
     {
         InitializeComponent();
         _auth = auth;
         _session = session;
     }
 
-    protected override async void OnAppearing()
+    private async void OnSignInClicked(object sender, EventArgs e)
     {
-        base.OnAppearing();
-
         try
         {
             var result = await _auth.LoginAsync();
@@ -26,9 +24,9 @@ public partial class MainPage : ContentPage
 
             await Shell.Current.GoToAsync(nameof(UnlockPage));
         }
-        catch
+        catch (Exception ex)
         {
-            await Shell.Current.GoToAsync(nameof(LoginPage));
+            StatusLabel.Text = ex.Message;
         }
     }
 }

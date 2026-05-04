@@ -1,7 +1,7 @@
 using PasswordManager.Core.Commands;
 using PasswordManager.Core.Models;
 using PasswordManager.Core.Services;
-using static System.Net.Mime.MediaTypeNames;
+using PasswordManager.UI.Services;
 
 namespace PasswordManager.UI;
 
@@ -9,32 +9,35 @@ public partial class VaultPage : ContentPage
 {
     private readonly VaultApplication _app;
     private readonly CommandDispatcher _dispatcher;
+    private readonly UserSession _session;
 
-    public VaultPage(VaultApplication app, CommandDispatcher dispatcher)
+    public VaultPage(
+        VaultApplication app,
+        CommandDispatcher dispatcher,
+        UserSession session)
     {
         InitializeComponent();
         _app = app;
         _dispatcher = dispatcher;
+        _session = session;
     }
+
+    private string UserId => _session.UserId!;
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
         LoadEntries();
     }
 
     private void LoadEntries()
     {
         var entries = _app.GetEntries();
-        EntriesList.ItemsSource = null;
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            EntriesList.ItemsSource = _app.GetEntries();
+            EntriesList.ItemsSource = entries;
         });
-
-        EntriesList.InvalidateMeasure();
 
         DebugLabel.Text = $"Entries: {entries.Count}";
     }
@@ -59,10 +62,10 @@ public partial class VaultPage : ContentPage
             Password = password
         };
 
-        await _dispatcher.DispatchAsync(new AddEntryCommand(entry));
+        await _dispatcher.DispatchAsync(
+            new AddEntryCommand(UserId, entry)
+        );
 
-
-        // clear inputs
         SiteEntry.Text = "";
         UsernameEntry.Text = "";
         PasswordEntry.Text = "";
@@ -72,9 +75,9 @@ public partial class VaultPage : ContentPage
 
     private async void OnGenerateClicked(object sender, EventArgs e)
     {
-
-        var password = await _dispatcher.DispatchAsync(new GeneratePasswordQuery(10));
-
+        var password = await _dispatcher.DispatchAsync(
+            new GeneratePasswordQuery(10)
+        );
 
         PasswordEntry.Text = password;
     }
@@ -116,7 +119,10 @@ public partial class VaultPage : ContentPage
         if (!confirm)
             return;
 
-        await _dispatcher.DispatchAsync(new DeleteEntryCommand(entry));
+        await _dispatcher.DispatchAsync(
+            new DeleteEntryCommand(UserId, entry)
+        );
 
+        LoadEntries();
     }
 }
