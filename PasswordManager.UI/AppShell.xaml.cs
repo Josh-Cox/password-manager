@@ -1,14 +1,13 @@
-﻿namespace PasswordManager.UI
+﻿namespace PasswordManager.UI;
+
+public partial class AppShell : Shell
 {
-    public partial class AppShell : Shell
+    public AppShell()
     {
-        public AppShell()
-        {
-            InitializeComponent();
-            Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
-            Routing.RegisterRoute(nameof(VaultPage), typeof(VaultPage));
-            Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
-            Routing.RegisterRoute(nameof(UnlockPage), typeof(UnlockPage));
-        }
+        InitializeComponent();
+
+        Routing.RegisterRoute(nameof(VaultPage), typeof(VaultPage));
+        Routing.RegisterRoute(nameof(AddEntryPage), typeof(AddEntryPage));
+        Routing.RegisterRoute(nameof(UnlockPage), typeof(UnlockPage));
     }
 }

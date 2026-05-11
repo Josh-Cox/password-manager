@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PasswordManager.Core.Commands
+namespace PasswordManager.Core.Com.Interfaces
 {
     public interface ICommandHandler<TCommand> where TCommand : ICommand
     {

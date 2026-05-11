@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PasswordManager.Core.Commands;
+using PasswordManager.Core.Com.Commands;
+using PasswordManager.Core.Com.Handlers;
+using PasswordManager.Core.Com.Interfaces;
+using PasswordManager.Core.Com.Queries;
 
 namespace PasswordManager.Core.Services
 {
@@ -14,7 +17,9 @@ namespace PasswordManager.Core.Services
         public CommandDispatcher(
             AddEntryHandler addHandler,
             DeleteEntryHandler deleteHandler,
-            GeneratePasswordHandler generateHandler)
+            LoadVaultHandler loadVaultHandler,
+            GeneratePasswordHandler generateHandler,
+            GetEntriesHandler getEntriesHandler)
         {
             _commandHandlers = new()
             {
@@ -25,7 +30,12 @@ namespace PasswordManager.Core.Services
                 {
                     typeof(DeleteEntryCommand),
                     command => deleteHandler.HandleAsync((DeleteEntryCommand)command)
-                }
+                },
+                {
+                    typeof(LoadVaultCommand),
+                    command => loadVaultHandler.HandleAsync((LoadVaultCommand)command)
+                },
+
             };
 
             _queryHandlers = new()
@@ -35,6 +45,14 @@ namespace PasswordManager.Core.Services
                     async query =>
                     {
                         var result = await generateHandler.HandleAsync((GeneratePasswordQuery)query);
+                        return (object)result;
+                    }
+                },
+                                {
+                    typeof(GetEntriesQuery),
+                    async query =>
+                    {
+                        var result = await getEntriesHandler.HandleAsync((GetEntriesQuery)query);
                         return (object)result;
                     }
                 }

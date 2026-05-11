@@ -1,17 +1,18 @@
-﻿using PasswordManager.Core.Services;
+﻿using PasswordManager.Core.Com.Commands;
+using PasswordManager.Core.Services;
 using PasswordManager.UI.Services;
 
 namespace PasswordManager.UI;
 
 public partial class UnlockPage : ContentPage
 {
-    private readonly VaultApplication _app;
+    private readonly CommandDispatcher _dispatcher;
     private readonly UserSession _session;
 
-    public UnlockPage(VaultApplication app, UserSession session)
+    public UnlockPage(CommandDispatcher dispatcher, UserSession session)
     {
         InitializeComponent();
-        _app = app;
+        _dispatcher = dispatcher;
         _session = session;
     }
 
@@ -27,7 +28,11 @@ public partial class UnlockPage : ContentPage
                 return;
             }
 
-            await _app.LoadVaultAsync(_session.UserId!, password);
+            LoadingIndicator.IsVisible = true;
+            LoadingIndicator.IsRunning = true;
+
+            await _dispatcher.DispatchAsync(
+                new LoadVaultCommand(_session.UserId!, password));
 
             await Shell.Current.GoToAsync(nameof(VaultPage));
         }
@@ -35,5 +40,12 @@ public partial class UnlockPage : ContentPage
         {
             StatusLabel.Text = ex.Message;
         }
+        finally
+        {
+            LoadingIndicator.IsVisible = false;
+            LoadingIndicator.IsRunning = false;
+        }
     }
+
+
 }

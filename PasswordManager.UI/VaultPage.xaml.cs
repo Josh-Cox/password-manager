@@ -1,25 +1,30 @@
-using PasswordManager.Core.Commands;
+using PasswordManager.Core.Com.Commands;
+using PasswordManager.Core.Com.Queries;
 using PasswordManager.Core.Models;
 using PasswordManager.Core.Services;
 using PasswordManager.UI.Services;
+using System.Collections.ObjectModel;
 
 namespace PasswordManager.UI;
 
 public partial class VaultPage : ContentPage
 {
-    private readonly VaultApplication _app;
     private readonly CommandDispatcher _dispatcher;
     private readonly UserSession _session;
+    private readonly AuthService _auth;
+
+    private ObservableCollection<PasswordEntry> _entries = new();
 
     public VaultPage(
-        VaultApplication app,
         CommandDispatcher dispatcher,
-        UserSession session)
+        UserSession session,
+        AuthService auth)
     {
         InitializeComponent();
-        _app = app;
+
         _dispatcher = dispatcher;
         _session = session;
+        _auth = auth;
     }
 
     private string UserId => _session.UserId!;
@@ -27,102 +32,144 @@ public partial class VaultPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        LoadEntries();
-    }
-
-    private void LoadEntries()
-    {
-        var entries = _app.GetEntries();
-
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            EntriesList.ItemsSource = entries;
-        });
-
-        DebugLabel.Text = $"Entries: {entries.Count}";
-    }
-
-    private async void OnAddEntryClicked(object sender, EventArgs e)
-    {
-        var site = SiteEntry.Text;
-        var username = UsernameEntry.Text;
-        var password = PasswordEntry.Text;
-
-        if (string.IsNullOrWhiteSpace(site) ||
-            string.IsNullOrWhiteSpace(username) ||
-            string.IsNullOrWhiteSpace(password))
-        {
-            return;
-        }
-
-        var entry = new PasswordEntry
-        {
-            Site = site,
-            Username = username,
-            Password = password
-        };
-
-        await _dispatcher.DispatchAsync(
-            new AddEntryCommand(UserId, entry)
-        );
-
-        SiteEntry.Text = "";
-        UsernameEntry.Text = "";
-        PasswordEntry.Text = "";
 
         LoadEntries();
     }
 
-    private async void OnGenerateClicked(object sender, EventArgs e)
+    private async void LoadEntries()
     {
-        var password = await _dispatcher.DispatchAsync(
-            new GeneratePasswordQuery(10)
-        );
+        var entries = await _dispatcher.DispatchAsync(
+            new GetEntriesQuery());
 
-        PasswordEntry.Text = password;
+        _entries = new ObservableCollection<PasswordEntry>(
+            entries);
+
+        EntriesList.ItemsSource = _entries;
+
+        DebugLabel.Text =
+            $"{_entries.Count} entries";
     }
 
-    private async void OnEntrySelected(object sender, SelectionChangedEventArgs e)
+    private async void OnEntrySelected(
+        object sender,
+        SelectionChangedEventArgs e)
     {
-        var entry = e.CurrentSelection.FirstOrDefault() as PasswordEntry;
+        var entry =
+            e.CurrentSelection
+                .FirstOrDefault() as PasswordEntry;
 
         if (entry == null)
             return;
 
-        await Clipboard.Default.SetTextAsync(entry.Password);
+        await Clipboard.Default.SetTextAsync(
+            entry.Password);
 
-        await DisplayAlertAsync("Copied to Clipboard", entry.Site, "OK");
+        await DisplayAlertAsync(
+            "Copied",
+            $"{entry.Site} password copied",
+            "OK");
 
         ((CollectionView)sender).SelectedItem = null;
     }
 
-    private async void OnViewEntryClicked(object sender, EventArgs e)
+    private void OnSearchChanged(
+        object sender,
+        TextChangedEventArgs e)
     {
-        var button = (Button)sender;
-        var entry = (PasswordEntry)button.BindingContext;
+        var search =
+            e.NewTextValue?.ToLower() ?? "";
 
-        await DisplayAlertAsync(entry.Site, entry.Password, "OK");
+        var filtered =
+            _entries.Where(x =>
+                (x.Site?.ToLower().Contains(search) ?? false) ||
+                (x.Username?.ToLower().Contains(search) ?? false))
+            .ToList();
+
+        EntriesList.ItemsSource = filtered;
     }
 
-    private async void OnEntryDeleted(object sender, EventArgs e)
+    private async void OnAddEntryClicked(
+        object sender,
+        EventArgs e)
+    {
+        await Shell.Current.GoToAsync(
+            nameof(AddEntryPage));
+    }
+
+    private async void OnCopyClicked(
+        object sender,
+        EventArgs e)
     {
         var button = (Button)sender;
-        var entry = (PasswordEntry)button.BindingContext;
 
-        bool confirm = await DisplayAlertAsync(
-            "Confirm Delete",
-            $"Delete entry for {entry.Site}?",
-            "Delete",
-            "Cancel"
-        );
+        var entry =
+            (PasswordEntry)button.BindingContext;
+
+        await Clipboard.Default.SetTextAsync(
+            entry.Password);
+
+        await DisplayAlertAsync(
+            "Copied",
+            $"{entry.Site} password copied",
+            "OK");
+    }
+
+    private async void OnEditEntryClicked(
+        object sender,
+        EventArgs e)
+    {
+        var button = (Button)sender;
+
+        var entry =
+            (PasswordEntry)button.BindingContext;
+
+        var route =
+            $"{nameof(AddEntryPage)}?site={Uri.EscapeDataString(entry.Site)}";
+
+        await Shell.Current.GoToAsync(route);
+    }
+
+    private async void OnDeleteButtonClicked(
+        object sender,
+        EventArgs e)
+    {
+        var button = (Button)sender;
+
+        var entry =
+            (PasswordEntry)button.BindingContext;
+
+        bool confirm =
+            await DisplayAlertAsync(
+                "Delete Entry",
+                $"Delete {entry.Site}?",
+                "Delete",
+                "Cancel");
 
         if (!confirm)
             return;
 
         await _dispatcher.DispatchAsync(
-            new DeleteEntryCommand(UserId, entry)
-        );
+            new DeleteEntryCommand(
+                UserId,
+                entry));
 
         LoadEntries();
     }
+
+    private async void OnLogoutClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            await _auth.LogoutAsync();
+
+            _session.UserId = null;
+
+            await Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Logout error: {ex.Message}");
+        }
+    }
+
 }

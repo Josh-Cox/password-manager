@@ -20,9 +20,10 @@ public partial class LoginPage : ContentPage
         {
             var result = await _auth.LoginAsync();
 
-            _session.UserId = result.Account.HomeAccountId.ObjectId;
+            _session.UserId =
+                result.Account.HomeAccountId.Identifier;
 
-            await Shell.Current.GoToAsync(nameof(UnlockPage));
+            await Shell.Current.GoToAsync($"//{nameof(UnlockPage)}");
         }
         catch (Exception ex)
         {

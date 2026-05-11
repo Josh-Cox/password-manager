@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using PasswordManager.Core.Com.Interfaces;
 using PasswordManager.Core.Models;
 
-namespace PasswordManager.Core.Commands
+namespace PasswordManager.Core.Com.Commands
 {
     public class AddEntryCommand : ICommand
     {       

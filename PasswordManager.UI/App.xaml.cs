@@ -1,17 +1,43 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using PasswordManager.UI.Services;
 
-namespace PasswordManager.UI
+namespace PasswordManager.UI;
+
+public partial class App : Application
 {
-    public partial class App : Application
-    {
-        public App()
-        {
-            InitializeComponent();
-        }
+    private readonly AuthService _auth;
+    private readonly UserSession _session;
 
-        protected override Window CreateWindow(IActivationState? activationState)
+    public App(AuthService auth, UserSession session)
+    {
+        InitializeComponent();
+        _auth = auth;
+        _session = session;
+    }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        var window = new Window(new AppShell());
+
+        _ = Task.Run(async () =>
         {
-            return new Window(new AppShell());
-        }
+            var result = await _auth.GetSilentAccountAsync();
+
+            if (result != null)
+            {
+                _session.UserId = result.Account.HomeAccountId.Identifier;
+            }
+            else
+            {
+                var login = await _auth.LoginAsync();
+                _session.UserId = login.Account.HomeAccountId.Identifier;
+            }
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await Shell.Current.GoToAsync($"//{nameof(UnlockPage)}");
+            });
+        });
+
+        return window;
     }
 }

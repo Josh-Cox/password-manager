@@ -1,9 +1,11 @@
-﻿using PasswordManager.Core.Services;
+﻿using PasswordManager.Core.Com.Commands;
+using PasswordManager.Core.Com.Interfaces;
+using PasswordManager.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace PasswordManager.Core.Commands
+namespace PasswordManager.Core.Com.Handlers
 {
     public class DeleteEntryHandler : ICommandHandler<DeleteEntryCommand>
     {

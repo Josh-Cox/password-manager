@@ -1,25 +1,81 @@
 ﻿<ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    x:Class="PasswordManager.UI.UnlockPage">
+    x:Class="PasswordManager.UI.UnlockPage"
+    BackgroundColor="{StaticResource BackgroundColor}"
+    Shell.NavBarIsVisible="False">
 
-    <VerticalStackLayout Padding="20" Spacing="15" VerticalOptions="Center">
+    <Grid Padding="30">
 
-        <Label Text="Unlock Vault"
-               FontSize="26"
-               HorizontalOptions="Center" />
+        <VerticalStackLayout
+            Spacing="24"
+            VerticalOptions="Center">
 
-        <Entry x:Name="MasterPasswordEntry"
-               Placeholder="Master password"
-               IsPassword="True" />
+            <VerticalStackLayout Spacing="8">
 
-        <Button Text="Unlock"
-                Clicked="OnUnlockClicked" />
+                <Label
+                    Text="Unlock Vault"
+                    FontSize="34"
+                    FontAttributes="Bold"
+                    TextColor="{StaticResource PrimaryTextColor}" />
 
-        <Label x:Name="StatusLabel"
-               Text=""
-               HorizontalOptions="Center" />
+                <Label
+                    Text="Enter your master password"
+                    FontSize="16"
+                    TextColor="#94A3B8" />
 
-    </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <Border
+                BackgroundColor="{StaticResource SurfaceColor}"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 18"
+                Padding="18,8">
+
+                <Grid ColumnDefinitions="*,Auto">
+
+                    <Entry
+                        x:Name="MasterPasswordEntry"
+                        Placeholder="Master password"
+                        IsPassword="True"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource PrimaryTextColor}"
+                        PlaceholderColor="#64748B"
+                        Grid.Column="0"/>
+
+                    <!-- removed Clicked handler because method does not exist -->
+                    <ImageButton
+                        x:Name="TogglePasswordButton"
+                        Source="eye.png"
+                        BackgroundColor="Transparent"
+                        WidthRequest="24"
+                        HeightRequest="24"
+                        Grid.Column="1"/>
+
+                </Grid>
+
+            </Border>
+
+            <Button
+                Text="Unlock"
+                HeightRequest="56"
+                Style="{StaticResource PrimaryButtonStyle}"
+                FontAttributes="Bold"
+                Clicked="OnUnlockClicked"/>
+
+            <ActivityIndicator
+                x:Name="LoadingIndicator"
+                IsVisible="False"
+                IsRunning="False"
+                Color="White"/>
+
+            <Label
+                x:Name="StatusLabel"
+                TextColor="#F87171"
+                HorizontalOptions="Center" />
+
+        </VerticalStackLayout>
+
+    </Grid>
 
 </ContentPage>
