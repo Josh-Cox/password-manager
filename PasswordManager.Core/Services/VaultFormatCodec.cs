@@ -13,6 +13,16 @@ namespace PasswordManager.Core.Services
 
         public (byte[] Salt, byte[] EncryptedData) Read(byte[] fileBytes)
         {
+            const int MinimumEncryptedSize = 12 + 16; // nonce + tag
+            const int MinimumFileSize =
+                HeaderSize + SaltSize + MinimumEncryptedSize;
+
+            if (fileBytes == null || fileBytes.Length < MinimumFileSize)
+            {
+                throw new Exception(
+                    $"Vault file too small. Length: {fileBytes?.Length ?? 0}");
+            }
+
             int offset = 0;
 
             byte[] header = fileBytes[..HeaderSize];
@@ -25,6 +35,12 @@ namespace PasswordManager.Core.Services
             offset += SaltSize;
 
             byte[] encrypted = fileBytes[offset..];
+
+            if (encrypted.Length < MinimumEncryptedSize)
+            {
+                throw new Exception(
+                    $"Encrypted payload too small. Length: {encrypted.Length}");
+            }
 
             return (salt, encrypted);
         }

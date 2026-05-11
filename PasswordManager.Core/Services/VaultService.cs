@@ -54,9 +54,10 @@ namespace PasswordManager.Core.Services
         public async Task<VaultSession> LoadAsync(string userID, string masterPassword)
         {
 
-            if (!await _store.ExistsAsync(userID))
-            {
+            byte[]? fileBytes = await _store.ReadAllAsync(userID);
 
+            if (fileBytes == null)
+            {
                 var session = new VaultSession
                 {
                     MasterPassword = masterPassword,
@@ -64,13 +65,10 @@ namespace PasswordManager.Core.Services
                     Entries = new ObservableCollection<PasswordEntry>()
                 };
 
-                // save it immediately
                 await SaveAsync(userID, session);
 
                 return session;
             }
-
-            byte[] fileBytes = await _store.ReadAllAsync(userID);
 
             var (salt, encrypted) = _codec.Read(fileBytes);
 

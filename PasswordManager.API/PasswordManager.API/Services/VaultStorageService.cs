@@ -17,8 +17,8 @@ namespace PasswordManager.API.Services
         {
             var blob = _container.GetBlobClient($"{userId}.dat");
 
-            if (!await blob.ExistsAsync())
-                return null;
+            //if (!await blob.ExistsAsync())
+            //    return null;
 
             var response = await blob.DownloadContentAsync();
             return response.Value.Content.ToArray();

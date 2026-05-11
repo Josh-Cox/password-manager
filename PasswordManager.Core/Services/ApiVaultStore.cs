@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace PasswordManager.Core.Services
@@ -26,13 +27,26 @@ namespace PasswordManager.Core.Services
         public async Task WriteAllAsync(string userId, byte[] data)
         {
             var content = new ByteArrayContent(data);
-            await _client.PostAsync($"/vault/{userId}", content);
+
+            content.Headers.ContentType =
+                new System.Net.Http.Headers.MediaTypeHeaderValue(
+                    "application/octet-stream");
+
+            var response =
+                await _client.PostAsync($"/vault/{userId}", content);
+
+            var text = await response.Content.ReadAsStringAsync();
+
+            Debug.WriteLine($"UPLOAD STATUS: {response.StatusCode}");
+            Debug.WriteLine($"UPLOAD RESPONSE: {text}");
+
+            response.EnsureSuccessStatusCode();
         }
 
-        public async Task<bool> ExistsAsync(string userId)
-        {
-            var response = await _client.GetAsync($"/vault/{userId}");
-            return response.IsSuccessStatusCode;
-        }
+        //public async Task<bool> ExistsAsync(string userId)
+        //{
+        //    var response = await _client.GetAsync($"/vault/{userId}");
+        //    return response.IsSuccessStatusCode;
+        //}
     }
 }

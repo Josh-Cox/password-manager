@@ -2,6 +2,7 @@
 using PasswordManager.Core.Com.Handlers;
 using PasswordManager.Core.Services;
 using PasswordManager.UI.Services;
+using CommunityToolkit.Maui;
 
 namespace PasswordManager.UI;
 
@@ -12,7 +13,8 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
 
         builder
-            .UseMauiApp<App>();
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit();
 
         IConfiguration config;
 
@@ -25,23 +27,29 @@ public static class MauiProgram
             .AddJsonStream(stream)
             .Build();
 
+        builder.Services.AddSingleton<UserSession>();
+
         builder.Services.AddSingleton(new HttpClient
         {
             BaseAddress = new Uri(config["Api:BaseUrl"]!)
         });
 
-        builder.Services.AddSingleton<AuthService>(_ =>
+        builder.Services.AddSingleton<AuthService>(sp =>
         {
             var auth = config.GetSection("Auth");
+
+            var session =
+                sp.GetRequiredService<UserSession>();
 
             return new AuthService(
                 auth["ClientId"]!,
                 auth["TenantId"]!,
-                auth["Scope"]!
+                auth["Scope"]!,
+                session
             );
         });
 
-        builder.Services.AddSingleton<UserSession>();
+        
 
         builder.Services.AddSingleton<CryptoService>();
         builder.Services.AddSingleton<VaultFormatCodec>();

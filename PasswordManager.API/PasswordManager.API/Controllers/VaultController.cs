@@ -29,9 +29,17 @@ namespace PasswordManager.API.Controllers
         public async Task<IActionResult> SaveVault(string userId)
         {
             using var ms = new MemoryStream();
+
             await Request.Body.CopyToAsync(ms);
 
-            await _storage.SaveVaultAsync(userId, ms.ToArray());
+            var data = ms.ToArray();
+
+            Console.WriteLine($"API RECEIVED BYTES: {data.Length}");
+
+            if (data.Length == 0)
+                return BadRequest("Empty vault upload.");
+
+            await _storage.SaveVaultAsync(userId, data);
 
             return Ok();
         }

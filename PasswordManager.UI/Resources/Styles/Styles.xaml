@@ -65,11 +65,11 @@
 
         <Setter
             Property="TextColor"
-            Value="Black" />
+            Value="{StaticResource PrimaryTextColor}"  />
 
         <Setter
             Property="CornerRadius"
-            Value="16" />
+            Value="10" />
 
         <Setter
             Property="HeightRequest"
@@ -97,7 +97,7 @@
 
         <Setter
             Property="CornerRadius"
-            Value="16" />
+            Value="10" />
 
         <Setter
             Property="HeightRequest"
@@ -121,7 +121,7 @@
 
         <Setter
             Property="CornerRadius"
-            Value="16" />
+            Value="10" />
 
     </Style>
 
@@ -135,11 +135,11 @@
 
         <Setter
         Property="TextColor"
-        Value="{StaticResource SecondaryTextColor}" />
+        Value="{StaticResource PrimaryTextColor}" />
 
         <Setter
         Property="CornerRadius"
-        Value="14" />
+        Value="10" />
 
         <Setter
         Property="HeightRequest"
@@ -165,7 +165,7 @@
 
         <Setter
         Property="CornerRadius"
-        Value="12" />
+        Value="10" />
 
         <Setter
         Property="HeightRequest"
@@ -195,7 +195,7 @@
 
         <Setter
         Property="CornerRadius"
-        Value="12" />
+        Value="10" />
 
         <Setter
         Property="HeightRequest"

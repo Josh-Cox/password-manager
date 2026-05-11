@@ -5,5 +5,20 @@
     xmlns:local="clr-namespace:PasswordManager.UI"
     Title="PasswordManager">
 
+    <ShellContent
+        Route="Loading"
+        ContentTemplate="{DataTemplate local:LoadingPage}" />
+
+    <ShellContent
+        Route="LoginPage"
+        ContentTemplate="{DataTemplate local:LoginPage}" />
+
+    <ShellContent
+        Route="UnlockPage"
+        ContentTemplate="{DataTemplate local:UnlockPage}" />
+
+    <ShellContent
+        Route="VaultPage"
+        ContentTemplate="{DataTemplate local:VaultPage}" />
 
 </Shell>

@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="PasswordManager.UI.AddEntryPage"
+    BackgroundColor="{StaticResource BackgroundColor}"
+    Title="Add Entry"
+    Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+
+        <Grid Padding="24, 50"
+              HorizontalOptions="Center"
+              MaximumWidthRequest="700"
+              WidthRequest="350">
+
+            <VerticalStackLayout
+                Spacing="22"
+                HorizontalOptions="Fill">
+
+                <!-- Header -->
+                <VerticalStackLayout Spacing="6"
+                                     HorizontalOptions="Center">
+
+                    <Label
+                        Text="New Entry"
+                        FontSize="34"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource PrimaryTextColor}"
+                        HorizontalTextAlignment="Center"/>
+
+                </VerticalStackLayout>
+
+                <!-- Site -->
+                <Border
+                    BackgroundColor="{StaticResource SurfaceColor}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 18"
+                    Padding="18,12">
+
+                    <Entry
+                        x:Name="SiteEntry"
+                        Placeholder="Name / Site"
+                        PlaceholderColor="#64748B"
+                        TextColor="{StaticResource PrimaryTextColor}"
+                        BackgroundColor="Transparent"
+                        FontSize="16"/>
+                </Border>
+
+                <!-- Username -->
+                <Border
+                    BackgroundColor="{StaticResource SurfaceColor}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 18"
+                    Padding="18,12">
+
+                    <Entry
+                        x:Name="UsernameEntry"
+                        Placeholder="Username / Email"
+                        PlaceholderColor="#64748B"
+                        TextColor="{StaticResource PrimaryTextColor}"
+                        BackgroundColor="Transparent"
+                        FontSize="16"/>
+                </Border>
+
+                <!-- Password -->
+                <Border
+                    BackgroundColor="{StaticResource SurfaceColor}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 18"
+                    Padding="18,12">
+
+                    <Grid ColumnDefinitions="*,Auto">
+
+                        <Entry
+                            x:Name="PasswordEntry"
+                            Placeholder="Password"
+                            IsPassword="True"
+                            PlaceholderColor="#64748B"
+                            TextColor="{StaticResource PrimaryTextColor}"
+                            BackgroundColor="Transparent"
+                            FontSize="16"/>
+
+                        <Button
+                            Grid.Column="1"
+                            Text="Show"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource SecondaryTextColor}"
+                            Padding="10,0"
+                            Clicked="OnTogglePasswordClicked"/>
+                    </Grid>
+
+                </Border>
+
+                <!-- Secondary action -->
+                <Button
+                    Text="Generate Password"
+                    HeightRequest="42"
+                    WidthRequest="300"
+                    MaximumWidthRequest="320"
+                    HorizontalOptions="Center"
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    FontAttributes="None"
+                    Clicked="OnGenerateClicked"/>
+
+                
+                <!-- Primary CTA -->
+                <Button
+                    Text="Save Entry"
+                    HeightRequest="58"
+                    MaximumWidthRequest="320"
+                    HorizontalOptions="Center"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    WidthRequest="180"
+                    FontAttributes="Bold"
+                    FontSize="Medium"
+                    Clicked="OnSaveClicked"/>
+
+                <!-- Cancel -->
+                <Label
+                    Text="Cancel"
+                    HorizontalOptions="Center"
+                    TextColor="{StaticResource SecondaryTextColor}"
+                    FontSize="14">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCancelClicked"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+
+                <!-- Status -->
+                <Label
+                    x:Name="StatusLabel"
+                    TextColor="#F87171"
+                    HorizontalOptions="Center"
+                    HorizontalTextAlignment="Center"/>
+
+            </VerticalStackLayout>
+
+        </Grid>
+
+    </ScrollView>
+
+</ContentPage>

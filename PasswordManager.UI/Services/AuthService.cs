@@ -8,19 +8,34 @@ public class AuthService
     private readonly IPublicClientApplication _app;
     private readonly string[] _scopes;
     private IAccount? _cachedAccount;
+    private readonly UserSession _session;
 
-    public AuthService(string clientId, string tenantId, string scope)
+    public AuthService(
+    string clientId,
+    string tenantId,
+    string scope,
+    UserSession session)
     {
         var authority =
             $"https://{tenantId}.ciamlogin.com/{tenantId}/PasswordManagerSignIn";
 
+#if ANDROID
         _app = PublicClientApplicationBuilder
             .Create(clientId)
             .WithAuthority(authority)
-            .WithRedirectUri("http://localhost")
+            .WithRedirectUri($"msal{clientId}://auth")
             .Build();
+#endif
+#if WINDOWS
+        _app = PublicClientApplicationBuilder
+                    .Create(clientId)
+                    .WithAuthority(authority)
+                    .WithRedirectUri("http://localhost")
+                    .Build();
+#endif
 
         _scopes = new[] { scope };
+        _session = session;
 
 #if WINDOWS
         ConfigureTokenCache();
@@ -55,11 +70,9 @@ public class AuthService
 
         try
         {
-            var result = await _app
+            return await _app
                 .AcquireTokenSilent(_scopes, account)
                 .ExecuteAsync();
-
-            return result;
         }
         catch (MsalUiRequiredException)
         {
@@ -69,13 +82,28 @@ public class AuthService
 
     public async Task<AuthenticationResult> LoginAsync()
     {
-        var result = await _app
-            .AcquireTokenInteractive(_scopes)
-            .WithUseEmbeddedWebView(false)
-            .WithPrompt(Prompt.SelectAccount)
-            .ExecuteAsync();
+#if ANDROID
+                var activity = Platform.CurrentActivity;
+#endif
+
+                var builder = _app
+                    .AcquireTokenInteractive(_scopes)
+                    .WithUseEmbeddedWebView(false)
+                    .WithPrompt(Prompt.SelectAccount);
+
+#if ANDROID
+                builder = builder.WithParentActivityOrWindow(activity);
+#endif
+
+        var result = await builder.ExecuteAsync();
 
         _cachedAccount = result.Account;
+
+        _session.UserId =
+            UserIdentityHelper.GetStableUserId(result);
+
+        System.Diagnostics.Debug.WriteLine(
+    $"STABLE USER ID: {_session.UserId}");
 
         return result;
     }
@@ -88,5 +116,7 @@ public class AuthService
         {
             await _app.RemoveAsync(account);
         }
+
+        _cachedAccount = null;
     }
 }

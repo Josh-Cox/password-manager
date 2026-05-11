@@ -7,11 +7,11 @@
     <!-- Backgrounds -->
 
     <Color x:Key="BackgroundColor">
-        #121212
+        #231F20
     </Color>
 
     <Color x:Key="SurfaceColor">
-        #1E1E1E
+        #292828
     </Color>
 
     <Color x:Key="DividerColor">
@@ -25,17 +25,17 @@
     </Color>
 
     <Color x:Key="SecondaryTextColor">
-        #A1A1AA
+        #dbdbdb
     </Color>
 
     <!-- Accent -->
 
     <Color x:Key="AccentColor">
-        #7DD3FC
+        #709255
     </Color>
 
     <Color x:Key="AccentColorDark">
-        #38BDF8
+        #5c7846
     </Color>
 
     <!-- Danger -->
