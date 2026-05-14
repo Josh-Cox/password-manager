@@ -1,248 +1,172 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 
 <ResourceDictionary
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
-
-    <!-- Page -->
-
-    <Style TargetType="ContentPage">
-
-        <Setter
-            Property="BackgroundColor"
-            Value="{StaticResource BackgroundColor}" />
-
-    </Style>
-
-    <!-- Primary Label -->
-
-    <Style
-        x:Key="PrimaryLabelStyle"
-        TargetType="Label">
-
-        <Setter
-            Property="TextColor"
-            Value="{StaticResource PrimaryTextColor}" />
-
-    </Style>
-
-    <!-- Secondary Label -->
-
-    <Style
-        x:Key="SecondaryLabelStyle"
-        TargetType="Label">
-
-        <Setter
-            Property="TextColor"
-            Value="{StaticResource SecondaryTextColor}" />
-
-    </Style>
-
-    <!-- Entry -->
-
-    <Style TargetType="Entry">
-
-        <Setter Property="BackgroundColor" Value="Transparent" />
-        <Setter Property="TextColor" Value="{StaticResource PrimaryTextColor}" />
-        <Setter Property="PlaceholderColor" Value="{StaticResource SecondaryTextColor}" />
-        <Setter Property="IsTextPredictionEnabled" Value="False" />
-        <Setter Property="IsSpellCheckEnabled" Value="False" />
-
-        <!-- THIS removes native platform borders -->
-        <Setter Property="ClearButtonVisibility" Value="Never" />
-
-    </Style>
-
-    <!-- Primary Button -->
-
-    <Style
-        x:Key="PrimaryButtonStyle"
-        TargetType="Button">
-
-        <Setter
-            Property="BackgroundColor"
-            Value="{StaticResource AccentColor}" />
-
-        <Setter
-            Property="TextColor"
-            Value="{StaticResource PrimaryTextColor}"  />
-
-        <Setter
-            Property="CornerRadius"
-            Value="10" />
-
-        <Setter
-            Property="HeightRequest"
-            Value="54" />
-
-        <Setter
-            Property="FontAttributes"
-            Value="Bold" />
-
-    </Style>
-
-    <!-- Secondary Button -->
-
-    <Style
-        x:Key="SecondaryButtonStyle"
-        TargetType="Button">
-
-        <Setter
-            Property="BackgroundColor"
-            Value="{StaticResource SurfaceColor}" />
-
-        <Setter
-            Property="TextColor"
-            Value="{StaticResource PrimaryTextColor}" />
-
-        <Setter
-            Property="CornerRadius"
-            Value="10" />
-
-        <Setter
-            Property="HeightRequest"
-            Value="54" />
-
-    </Style>
-
-    <!-- Danger Button -->
-
-    <Style
-        x:Key="DangerButtonStyle"
-        TargetType="Button">
-
-        <Setter
-            Property="BackgroundColor"
-            Value="#3B1F1F" />
-
-        <Setter
-            Property="TextColor"
-            Value="{StaticResource DangerColor}" />
-
-        <Setter
-            Property="CornerRadius"
-            Value="10" />
-
-    </Style>
-
-    <Style
-    x:Key="LogoutButtonStyle"
-    TargetType="Button">
-
-        <Setter
-        Property="BackgroundColor"
-        Value="{StaticResource SurfaceColor}" />
-
-        <Setter
-        Property="TextColor"
-        Value="{StaticResource PrimaryTextColor}" />
-
-        <Setter
-        Property="CornerRadius"
-        Value="10" />
-
-        <Setter
-        Property="HeightRequest"
-        Value="40" />
-
-        <Setter
-        Property="Padding"
-        Value="16,0" />
-
-    </Style>
-
-    <Style
-    x:Key="EditButtonStyle"
-    TargetType="Button">
-
-        <Setter
-        Property="BackgroundColor"
-        Value="#252525" />
-
-        <Setter
-        Property="TextColor"
-        Value="{StaticResource PrimaryTextColor}" />
-
-        <Setter
-        Property="CornerRadius"
-        Value="10" />
-
-        <Setter
-        Property="HeightRequest"
-        Value="36" />
-
-        <Setter
-        Property="WidthRequest"
-        Value="72" />
-
-        <Setter
-        Property="FontSize"
-        Value="12" />
-
-    </Style>
-
-    <Style
-    x:Key="DeleteButtonStyle"
-    TargetType="Button">
-
-        <Setter
-        Property="BackgroundColor"
-        Value="#2A1A1A" />
-
-        <Setter
-        Property="TextColor"
-        Value="{StaticResource DangerColor}" />
-
-        <Setter
-        Property="CornerRadius"
-        Value="10" />
-
-        <Setter
-        Property="HeightRequest"
-        Value="36" />
-
-        <Setter
-        Property="WidthRequest"
-        Value="80" />
-
-        <Setter
-        Property="FontSize"
-        Value="12" />
-
-    </Style>
-
-    <Style
-    x:Key="FloatingActionButtonStyle"
-    TargetType="Button">
-
-        <Setter
-        Property="BackgroundColor"
-        Value="{StaticResource AccentColor}" />
-
-        <Setter
-        Property="TextColor"
-        Value="Black" />
-
-        <Setter
-        Property="CornerRadius"
-        Value="34" />
-
-        <Setter
-        Property="WidthRequest"
-        Value="68" />
-
-        <Setter
-        Property="HeightRequest"
-        Value="68" />
-
-        <Setter
-        Property="FontSize"
-        Value="30" />
-
-        <Setter
-        Property="FontAttributes"
-        Value="Bold" />
-
-    </Style>
-
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+>
+  <!-- Shared Values-->
+
+  <x:Double x:Key="PrimaryCornerRadius">10</x:Double>
+
+  <!-- Page -->
+
+  <Style x:Key="PageBackgroundStyle" TargetType="ContentPage">
+    <Setter Property="BackgroundColor" Value="{StaticResource BackgroundColor}" />
+  </Style>
+
+  <!-- Primary Label -->
+
+  <Style x:Key="PrimaryLabelStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource PrimaryTextColor}" />
+
+    <Setter Property="FontSize" Value="28" />
+
+    <Setter Property="HorizontalOptions" Value="Center" />
+    <Setter Property="HorizontalTextAlignment" Value="Center" />
+  </Style>
+
+  <!-- Secondary Label -->
+
+  <Style x:Key="SecondaryLabelStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource SecondaryTextColor}" />
+    <Setter Property="HorizontalTextAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="16" />
+  </Style>
+
+  <!-- Status Label -->
+
+  <Style x:Key="StatusLabelStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource DangerColor}" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="HorizontalOptions" Value="Center" />
+    <Setter Property="HorizontalTextAlignment" Value="Center" />
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <!-- Divider -->
+  <Style x:Key="PrimaryDividerStyle" TargetType="BoxView">
+    <Setter Property="HeightRequest" Value="1" />
+    <Setter Property="Margin" Value="0,10" />
+    <Setter Property="BackgroundColor" Value="{StaticResource DividerColor}" />
+  </Style>
+  <!-- Entry -->
+
+  <Style x:Key="PrimaryEntryStyle" TargetType="Entry">
+    <Setter Property="BackgroundColor" Value="Transparent" />
+    <Setter Property="TextColor" Value="{StaticResource PrimaryTextColor}" />
+    <Setter Property="PlaceholderColor" Value="{StaticResource SecondaryTextColor}" />
+    <Setter Property="IsTextPredictionEnabled" Value="False" />
+    <Setter Property="IsSpellCheckEnabled" Value="False" />
+    <Setter Property="TextTransform" Value="None" />
+    <Setter Property="HorizontalTextAlignment" Value="Center" />
+    <Setter Property="HorizontalOptions" Value="Fill" />
+    <Setter Property="ClearButtonVisibility" Value="WhileEditing" />
+  </Style>
+
+  <!-- SearchBar Border -->
+  <Style x:Key="PriamrySearchBarBorderStyle" TargetType="Border">
+    <Setter Property="BackgroundColor" Value="{StaticResource SurfaceColor}" />
+    <Setter Property="StrokeThickness" Value="0" />
+    <Setter Property="StrokeShape" Value="RoundRectangle 5" />
+    <Setter Property="HeightRequest" Value="46" />
+    <Setter Property="WidthRequest" Value="200" />
+    <Setter Property="HorizontalOptions" Value="Start" />
+  </Style>
+
+  <!-- SearchBar -->
+
+  <Style x:Key="PrimarySearchBarStyle" TargetType="SearchBar">
+    <Setter Property="Placeholder" Value="Search..." />
+    <Setter Property="TextColor" Value="{StaticResource PrimaryTextColor}" />
+    <Setter Property="BackgroundColor" Value="{StaticResource SurfaceColor}" />
+    <Setter Property="PlaceholderColor" Value="{StaticResource SecondaryTextColor}" />
+    <Setter Property="SearchIconColor" Value="{StaticResource AccentColor}" />
+    <Setter Property="HorizontalOptions" Value="Start" />
+    <Setter Property="VerticalOptions" Value="Center" />
+    <Setter Property="HorizontalTextAlignment" Value="Start" />
+  </Style>
+
+  <!-- Activity Overlay -->
+
+  <Style x:Key="ActivityOverlayStyle" TargetType="Grid">
+    <Setter Property="BackgroundColor" Value="{StaticResource LoadingOverlayColor}" />
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="IsVisible" Value="False" />
+    <Setter Property="InputTransparent" Value="True" />
+  </Style>
+
+  <!-- Activity Indicator -->
+
+  <Style x:Key="ActivityIndicatorStyle" TargetType="ActivityIndicator">
+    <Setter Property="Color" Value="{StaticResource AccentColor}" />
+    <Setter Property="WidthRequest" Value="48" />
+    <Setter Property="HeightRequest" Value="48" />
+    <Setter Property="HorizontalOptions" Value="Center" />
+    <Setter Property="VerticalOptions" Value="Center" />
+    <Setter Property="IsRunning" Value="True" />
+  </Style>
+
+  <!-- Primary Button -->
+
+  <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+    <Setter Property="BackgroundColor" Value="{StaticResource AccentColor}" />
+    <Setter Property="TextColor" Value="{StaticResource PrimaryTextColor}" />
+    <Setter Property="CornerRadius" Value="{StaticResource PrimaryCornerRadius}" />
+    <Setter Property="HeightRequest" Value="54" />
+    <Setter Property="WidthRequest" Value="220" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="Medium" />
+    <Setter Property="HorizontalOptions" Value="Center" />
+  </Style>
+
+  <!-- Secondary Button -->
+
+  <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+    <Setter Property="BackgroundColor" Value="{StaticResource SurfaceColor}" />
+    <Setter Property="TextColor" Value="{StaticResource PrimaryTextColor}" />
+    <Setter Property="CornerRadius" Value="{StaticResource PrimaryCornerRadius}" />
+    <Setter Property="HeightRequest" Value="54" />
+  </Style>
+
+  <!-- Danger Button -->
+
+  <Style x:Key="DangerButtonStyle" TargetType="Button">
+    <Setter Property="BackgroundColor" Value="#3B1F1F" />
+    <Setter Property="TextColor" Value="{StaticResource DangerColor}" />
+    <Setter Property="CornerRadius" Value="{StaticResource PrimaryCornerRadius}" />
+  </Style>
+
+  <!-- Logout Button -->
+
+  <Style x:Key="LogoutButtonStyle" TargetType="Button">
+    <Setter Property="BackgroundColor" Value="{StaticResource SurfaceColor}" />
+    <Setter Property="TextColor" Value="{StaticResource PrimaryTextColor}" />
+    <Setter Property="Text" Value="Logout" />
+    <Setter Property="CornerRadius" Value="{StaticResource PrimaryCornerRadius}" />
+    <Setter Property="HeightRequest" Value="46" />
+    <Setter Property="WidthRequest" Value="100" />
+    <Setter Property="HorizontalOptions" Value="End" />
+    <Setter Property="VerticalOptions" Value="Start" />
+    <Setter Property="Padding" Value="16,0" />
+  </Style>
+
+  <!-- Image Button -->
+
+  <Style x:Key="PrimaryImageButton" TargetType="ImageButton">
+    <Setter Property="HeightRequest" Value="35" />
+    <Setter Property="WidthRequest" Value="35" />
+    <Setter Property="Opacity" Value="0.9" />
+  </Style>
+
+  <!-- Floating Button -->
+
+  <Style x:Key="FloatingActionButtonStyle" TargetType="Button">
+    <Setter Property="BackgroundColor" Value="{StaticResource AccentColor}" />
+    <Setter Property="TextColor" Value="{StaticResource SurfaceColor}" />
+    <Setter Property="CornerRadius" Value="34" />
+    <Setter Property="WidthRequest" Value="68" />
+    <Setter Property="HeightRequest" Value="68" />
+    <Setter Property="FontSize" Value="40" />
+    <Setter Property="FontAttributes" Value="Bold" />
+  </Style>
 </ResourceDictionary>

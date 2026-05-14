@@ -18,7 +18,10 @@ namespace PasswordManager.Core.Com.Handlers
 
         public async Task HandleAsync(LoadVaultCommand command)
         {
-            await _app.LoadVaultAsync(command.UserID, command.MasterPassword);
+            var ok = await _app.LoadVaultAsync(command.UserID, command.MasterPassword);
+
+            if (!ok)
+                throw new UnauthorizedAccessException("Invalid password");
         }
     }
 }

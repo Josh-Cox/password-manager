@@ -56,9 +56,8 @@ public partial class AddEntryPage : ContentPage
         }
     }
 
-    private async void OnGenerateClicked(
-        object sender,
-        EventArgs e)
+    // <================ Button Events ================> //
+    private async void OnGenerateClicked(object sender, EventArgs e)
     {
         var password =
             await _dispatcher.DispatchAsync(
@@ -67,9 +66,7 @@ public partial class AddEntryPage : ContentPage
         PasswordEntry.Text = password;
     }
 
-    private async void OnSaveClicked(
-        object sender,
-        EventArgs e)
+    private async void OnSaveClicked(object sender, EventArgs e)
     {
         var site = SiteEntry.Text?.Trim();
         var username = UsernameEntry.Text?.Trim();
@@ -102,10 +99,7 @@ public partial class AddEntryPage : ContentPage
                 Password = password
             };
 
-            await _dispatcher.DispatchAsync(
-                new AddEntryCommand(
-                    _session.UserId!,
-                    newEntry));
+            await _dispatcher.DispatchAsync(new AddEntryCommand(_session.UserId!, newEntry));
 
             await Shell.Current.GoToAsync("..");
         }
@@ -115,16 +109,12 @@ public partial class AddEntryPage : ContentPage
         }
     }
 
-    private async void OnCancelClicked(
-    object sender,
-    EventArgs e)
+    private async void OnCancelClicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("..");
     }
 
-    private void OnTogglePasswordClicked(
-        object sender,
-        EventArgs e)
+    private void OnTogglePasswordClicked(object sender, EventArgs e)
     {
         _isPasswordVisible =
             !_isPasswordVisible;

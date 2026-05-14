@@ -1,33 +1,36 @@
 ﻿<ContentPage
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    BackgroundColor="{StaticResource BackgroundColor}"
-    x:Class="PasswordManager.UI.LoginPage">
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  x:Class="PasswordManager.UI.LoginPage"
+  Style="{StaticResource PageBackgroundStyle}"
+  Shell.NavBarIsVisible="False"
+  Shell.FlyoutBehavior="Disabled"
+>
+  <Grid>
+    <!-- Main Content -->
+    <VerticalStackLayout
+      Padding="24"
+      Spacing="20"
+      VerticalOptions="Center"
+      HorizontalOptions="Center"
+      MaximumWidthRequest="420"
+    >
+      <Label Text="Password Manager" Style="{StaticResource PrimaryLabelStyle}" />
 
-    <VerticalStackLayout Padding="24" Spacing="20" VerticalOptions="Center">
+      <Button
+        x:Name="SignInButton"
+        Text="Sign In"
+        Style="{StaticResource PrimaryButtonStyle}"
+        Clicked="OnSignInClicked"
+        SemanticProperties.Description="Sign in to your password manager account"
+      />
 
-        <Label Text="Password Manager"
-               FontSize="28"
-               TextColor="{StaticResource PrimaryTextColor}"
-               HorizontalOptions="Center" />
-
-        <ActivityIndicator
-                x:Name="LoadingIndicator"
-                IsVisible="False"
-                IsRunning="False" />
-
-            <Button
-                x:Name="SignInButton"
-                Text="Sign In"
-                Style="{StaticResource PrimaryButtonStyle}"
-                FontSize="Medium"
-                WidthRequest="220"
-                Clicked="OnSignInClicked" />
-
-        <Label x:Name="StatusLabel"
-               Text=""
-               HorizontalOptions="Center" />
-
+      <Label x:Name="StatusLabel" Text="" Style="{StaticResource StatusLabelStyle}" />
     </VerticalStackLayout>
 
+    <!-- Loading Overlay -->
+    <Grid x:Name="LoadingOverlay" Style="{StaticResource ActivityOverlayStyle}">
+      <ActivityIndicator IsRunning="True" Style="{StaticResource ActivityIndicatorStyle}" />
+    </Grid>
+  </Grid>
 </ContentPage>

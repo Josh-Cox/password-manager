@@ -13,9 +13,15 @@ namespace PasswordManager.Core.Services
             _vaultService = vaultService;
         }
 
-        public async Task LoadVaultAsync(string userID, string masterPassword)
+        public async Task<bool> LoadVaultAsync(string userID, string masterPassword)
         {
-            _session = await _vaultService.LoadAsync(userID, masterPassword);
+            var session = await _vaultService.LoadAsync(userID, masterPassword);
+
+            if (session == null)
+                return false;
+
+            _session = session;
+            return true;
         }
 
         public ObservableCollection<PasswordEntry> GetEntries()

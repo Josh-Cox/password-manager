@@ -1,47 +1,50 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 
 <ResourceDictionary
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+>
+  <!-- Backgrounds -->
 
-    <!-- Backgrounds -->
-
-    <Color x:Key="BackgroundColor">
+  <Color x:Key="BackgroundColor">
         #231F20
     </Color>
 
-    <Color x:Key="SurfaceColor">
+  <Color x:Key="SurfaceColor">
         #292828
     </Color>
 
-    <Color x:Key="DividerColor">
+  <Color x:Key="DividerColor">
         #2A2A2A
     </Color>
 
-    <!-- Text -->
+  <Color x:Key="LoadingOverlayColor">
+        #80000000
+    </Color>
 
-    <Color x:Key="PrimaryTextColor">
+  <!-- Text -->
+
+  <Color x:Key="PrimaryTextColor">
         #FFFFFF
     </Color>
 
-    <Color x:Key="SecondaryTextColor">
-        #dbdbdb
+  <Color x:Key="SecondaryTextColor">
+        #94A3B8
     </Color>
 
-    <!-- Accent -->
+  <!-- Accent -->
 
-    <Color x:Key="AccentColor">
+  <Color x:Key="AccentColor">
         #709255
     </Color>
 
-    <Color x:Key="AccentColorDark">
+  <Color x:Key="AccentColorDark">
         #5c7846
     </Color>
 
-    <!-- Danger -->
+  <!-- Danger -->
 
-    <Color x:Key="DangerColor">
+  <Color x:Key="DangerColor">
         #F87171
     </Color>
-
 </ResourceDictionary>
