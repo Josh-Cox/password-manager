@@ -10,6 +10,7 @@ publish/
 # Environment variables
 ########################################
 *.env
+*.keystore
 
 ########################################
 # User / IDE files
