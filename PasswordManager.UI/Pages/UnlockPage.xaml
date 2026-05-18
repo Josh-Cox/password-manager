@@ -5,11 +5,11 @@
   BackgroundColor="{StaticResource BackgroundColor}"
   Shell.NavBarIsVisible="False"
 >
-  <Grid>
+    <Grid x:Name="Root"  InputTransparent="{Binding IsBusy}">
     <!-- Main Content -->
     <Grid Padding="24">
       <!-- Logout -->
-      <Button Text="Logout" Style="{StaticResource LogoutButtonStyle}" Clicked="OnLogoutClicked" />
+      <Button x:Name="LogoutButton" Text="Logout" Style="{StaticResource LogoutButtonStyle}" Clicked="OnLogoutClicked" />
 
       <!-- Main -->
       <VerticalStackLayout
@@ -18,12 +18,13 @@
         HorizontalOptions="Center"
         WidthRequest="300"
         MaximumWidthRequest="600"
+        IsEnabled="{Binding CanUnlock}"
       >
         <!-- Header -->
         <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
-          <Label Text="Unlock Vault" Style="{StaticResource PrimaryLabelStyle}" />
+          <Label x:Name="TitleLabel" Text="Unlock Vault" Style="{StaticResource PrimaryLabelStyle}" />
 
-          <Label Text="Enter your master password" Style="{StaticResource SecondaryLabelStyle}" />
+          <Label x:Name="SubtitleLabel" Text="Enter your master password" Style="{StaticResource SecondaryLabelStyle}" />
         </VerticalStackLayout>
 
         <!-- Password field -->

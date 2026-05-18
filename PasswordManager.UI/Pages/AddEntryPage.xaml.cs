@@ -1,4 +1,4 @@
-﻿using PasswordManager.Core.Com.Commands;
+using PasswordManager.Core.Com.Commands;
 using PasswordManager.Core.Com.Queries;
 using PasswordManager.Core.Models;
 using PasswordManager.Core.Services;
@@ -13,6 +13,7 @@ public partial class AddEntryPage : ContentPage
     private readonly UserSession _session;
 
     private bool _isPasswordVisible;
+    private bool _isBusy;
 
     public string? EditSite { get; set; }
 
@@ -28,8 +29,16 @@ public partial class AddEntryPage : ContentPage
         _session = session;
     }
 
+    private void SetBusy(bool busy)
+    {
+        _isBusy = busy;
+        SaveButton.IsEnabled = !busy;
+        GenerateButton.IsEnabled = !busy;
+    }
+
     protected override async void OnAppearing()
     {
+        Opacity = 0;
         base.OnAppearing();
 
         if (!string.IsNullOrWhiteSpace(EditSite))
@@ -44,21 +53,21 @@ public partial class AddEntryPage : ContentPage
 
             if (_editingEntry != null)
             {
-                SiteEntry.Text =
-                    _editingEntry.Site;
-
-                UsernameEntry.Text =
-                    _editingEntry.Username;
-
-                PasswordEntry.Text =
-                    _editingEntry.Password;
+                SiteEntry.Text = _editingEntry.Site;
+                UsernameEntry.Text = _editingEntry.Username;
+                PasswordEntry.Text = _editingEntry.Password;
             }
         }
+
+        await this.FadeTo(1, 200, Easing.CubicOut);
     }
 
     // <================ Button Events ================> //
+
     private async void OnGenerateClicked(object sender, EventArgs e)
     {
+        if (_isBusy) return;
+
         var password =
             await _dispatcher.DispatchAsync(
                 new GeneratePasswordQuery(16));
@@ -68,20 +77,49 @@ public partial class AddEntryPage : ContentPage
 
     private async void OnSaveClicked(object sender, EventArgs e)
     {
+        if (_isBusy) return;
+
         var site = SiteEntry.Text?.Trim();
         var username = UsernameEntry.Text?.Trim();
-        var password = PasswordEntry.Text;
+        var password = PasswordEntry.Text; // never trim passwords
 
-        if (string.IsNullOrWhiteSpace(site) ||
-            string.IsNullOrWhiteSpace(username) ||
-            string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(site))
         {
-            StatusLabel.Text =
-                "All fields are required";
-
+            StatusLabel.Text = "Site name is required.";
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            StatusLabel.Text = "Username is required.";
+            return;
+        }
+
+        if (string.IsNullOrEmpty(password))
+        {
+            StatusLabel.Text = "Password is required.";
+            return;
+        }
+
+        if (site.Length > 256)
+        {
+            StatusLabel.Text = "Site name must be 256 characters or fewer.";
+            return;
+        }
+
+        if (username.Length > 256)
+        {
+            StatusLabel.Text = "Username must be 256 characters or fewer.";
+            return;
+        }
+
+        if (password.Length > 512)
+        {
+            StatusLabel.Text = "Password must be 512 characters or fewer.";
+            return;
+        }
+
+        SetBusy(true);
         try
         {
             if (_editingEntry != null)
@@ -101,25 +139,30 @@ public partial class AddEntryPage : ContentPage
 
             await _dispatcher.DispatchAsync(new AddEntryCommand(_session.UserId!, newEntry));
 
-            await Shell.Current.GoToAsync("..");
+            await this.FadeTo(0, 120, Easing.CubicIn);
+            await Shell.Current.GoToAsync("..", animate: false);
         }
         catch (Exception ex)
         {
             StatusLabel.Text = ex.Message;
         }
+        finally
+        {
+            SetBusy(false);
+        }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("..");
+        if (_isBusy) return;
+
+        await this.FadeTo(0, 120, Easing.CubicIn);
+        await Shell.Current.GoToAsync("..", animate: false);
     }
 
     private void OnTogglePasswordClicked(object sender, EventArgs e)
     {
-        _isPasswordVisible =
-            !_isPasswordVisible;
-
-        PasswordEntry.IsPassword =
-            !_isPasswordVisible;
+        _isPasswordVisible = !_isPasswordVisible;
+        PasswordEntry.IsPassword = !_isPasswordVisible;
     }
 }

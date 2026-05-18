@@ -18,8 +18,10 @@ namespace PasswordManager.Core.Services
             AddEntryHandler addHandler,
             DeleteEntryHandler deleteHandler,
             LoadVaultHandler loadVaultHandler,
+            CreateVaultHandler createVaultHandler,
             GeneratePasswordHandler generateHandler,
-            GetEntriesHandler getEntriesHandler)
+            GetEntriesHandler getEntriesHandler,
+            VaultExistsHandler vaultExistsHandler)
         {
             _commandHandlers = new()
             {
@@ -35,6 +37,10 @@ namespace PasswordManager.Core.Services
                     typeof(LoadVaultCommand),
                     command => loadVaultHandler.HandleAsync((LoadVaultCommand)command)
                 },
+                {
+                    typeof(CreateVaultCommand),
+                    command => createVaultHandler.HandleAsync((CreateVaultCommand)command)
+                },
 
             };
 
@@ -48,11 +54,19 @@ namespace PasswordManager.Core.Services
                         return (object)result;
                     }
                 },
-                                {
+                {
                     typeof(GetEntriesQuery),
                     async query =>
                     {
                         var result = await getEntriesHandler.HandleAsync((GetEntriesQuery)query);
+                        return (object)result;
+                    }
+                },
+                {
+                    typeof(VaultExistsQuery),
+                    async query =>
+                    {
+                        var result = await vaultExistsHandler.HandleAsync((VaultExistsQuery)query);
                         return (object)result;
                     }
                 }

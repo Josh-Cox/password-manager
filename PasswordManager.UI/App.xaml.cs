@@ -35,7 +35,7 @@ public partial class App : Application
 
             if (result != null)
             {
-                _session.UserId = result.Account.HomeAccountId.Identifier;
+                _session.UserId = UserIdentityHelper.GetStableUserId(result);
 
                 await MainThread.InvokeOnMainThreadAsync(async () =>
                 {

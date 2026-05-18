@@ -1,10 +1,46 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using PasswordManager.API.Services;
-using PasswordManager.API.Controllers;
+using System.IdentityModel.Tokens.Jwt;
+
+JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Register services
 builder.Services.AddControllers();
+
+var auth = builder.Configuration.GetSection("Auth");
+var tenantId = auth["TenantId"];
+var authority = auth["Authority"] ?? $"https://{tenantId}.ciamlogin.com/{tenantId}/v2.0";
+var audience = auth["Audience"];
+var audienceClientId = audience?.Replace("api://", string.Empty);
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = authority;
+        options.MetadataAddress = $"{authority.TrimEnd('/')}/.well-known/openid-configuration";
+        options.Audience = audienceClientId;
+        options.MapInboundClaims = false;
+        options.IncludeErrorDetails = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = authority,
+            ValidateAudience = true,
+            ValidAudiences = string.IsNullOrWhiteSpace(audience)
+                ? []
+                : [audience, audienceClientId],
+            ValidateLifetime = true,
+            NameClaimType = "oid"
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddSingleton<VaultStorageService>(sp =>
 {
@@ -18,7 +54,7 @@ var app = builder.Build();
 // Middleware pipeline
 //app.UseHttpsRedirection();
 
-// (Auth will go here later)
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Map controllers to routes

@@ -1,122 +1,187 @@
-﻿using PasswordManager.Core.Com.Commands;
+using PasswordManager.Core.Com.Commands;
+using PasswordManager.Core.Com.Queries;
 using PasswordManager.Core.Services;
 using PasswordManager.UI.Helpers;
 using PasswordManager.UI.Services;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Net;
 
 namespace PasswordManager.UI;
 
-public partial class UnlockPage : ContentPage
+public partial class UnlockPage : ContentPage, INotifyPropertyChanged
 {
     private readonly CommandDispatcher _dispatcher;
     private readonly UserSession _session;
-    private bool _isUnlocking;
     private readonly AuthService _auth;
     private readonly SessionService _sessionService;
+
+    private bool _vaultExists;
+
+    private bool _isBusy;
+
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set
+        {
+            _isBusy = value;
+            OnPropertyChanged(nameof(IsBusy));
+        }
+    }
 
     public UnlockPage(
         CommandDispatcher dispatcher,
         UserSession session,
         AuthService auth,
-        SessionService sessionService
-    )
+        SessionService sessionService)
     {
         InitializeComponent();
         _dispatcher = dispatcher;
         _session = session;
         _auth = auth;
         _sessionService = sessionService;
+        BindingContext = this;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
-        if (_isUnlocking)
+        if (_isBusy)
             return;
 
+        Opacity = 0;
         base.OnAppearing();
-
-        //MainThread.BeginInvokeOnMainThread(() =>
-        //{
-        //    MasterPasswordEntry.Focus();
-        //});
 
         StatusLabel.Text = string.Empty;
         MasterPasswordEntry.Text = string.Empty;
+
+        try
+        {
+            _vaultExists = await _dispatcher.DispatchAsync(
+                new VaultExistsQuery(_session.UserId!));
+            UnlockButton.IsEnabled = true;
+        }
+        catch (HttpRequestException ex)
+        {
+            Debug.WriteLine(ex);
+            TitleLabel.Text = "Unable to Verify Vault";
+            SubtitleLabel.Text = "Please sign out and back in.";
+            UnlockButton.Text = "Unlock";
+            UnlockButton.IsEnabled = false;
+            StatusLabel.Text = ex.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden
+                ? $"Unable to verify your account ({(int?)ex.StatusCode}). Please sign out and back in."
+                : "Unable to check vault status.";
+            StatusLabel.IsVisible = true;
+            await this.FadeTo(1, 200, Easing.CubicOut);
+            return;
+        }
+
+        if (_vaultExists)
+        {
+            TitleLabel.Text = "Unlock Vault";
+            SubtitleLabel.Text = "Enter your master password";
+            UnlockButton.Text = "Unlock";
+        }
+        else
+        {
+            TitleLabel.Text = "No Vault Found";
+            SubtitleLabel.Text = "Set a master password to create your vault (min. 12 characters)";
+            UnlockButton.Text = "Create";
+        }
+
+        await this.FadeTo(1, 200, Easing.CubicOut);
     }
 
     // <================ Button Events ================> //
 
-    //TODO: Button event helper
     private async void OnLogoutClicked(object sender, EventArgs e)
     {
-        if (_isUnlocking)
+        if (_isBusy)
             return;
 
         await _sessionService.LogoutAsync();
     }
 
-    //TODO: Button event helper
+
     private async void OnUnlockClicked(object sender, EventArgs e)
     {
+        if (_isBusy)
+            return;
+
+        IsBusy = true;
+
         try
         {
-            await AsyncOperationHelper.RunAsync(
-                async () =>
-                {
-                    StatusLabel.Text = string.Empty;
-                    StatusLabel.IsVisible = false;
+            System.Diagnostics.Debug.WriteLine("UNLOCK PRESSED.");
+            System.Diagnostics.Debug.WriteLine(_isBusy);
 
-                    var password = MasterPasswordEntry.Text;
+            StatusLabel.Text = string.Empty;
+            StatusLabel.IsVisible = false;
 
-                    if (string.IsNullOrWhiteSpace(password))
-                    {
-                        StatusLabel.Text = "Enter master password";
-                        StatusLabel.IsVisible = true;
-                        return;
-                    }
+            var password = MasterPasswordEntry.Text;
 
-                    await LoadingOverlay.ShowAsync();
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                StatusLabel.Text = "Enter master password.";
+                StatusLabel.IsVisible = true;
+                return;
+            }
 
-                    await Task.Delay(50);
+            await LoadingOverlay.ShowAsync();
 
-                    try
-                    {
-                        //TODO: Reduce password being passed
-                        await _dispatcher.DispatchAsync(
-                            new LoadVaultCommand(_session.UserId!, password)
-                        );
-                    }
-                    catch
-                    {
-                        StatusLabel.Text = "Invalid password";
-                        StatusLabel.IsVisible = true;
-                        return;
-                    }
+            if (_vaultExists)
+            {
+                await _dispatcher.DispatchAsync(
+                    new LoadVaultCommand(_session.UserId!, password));
+            }
+            else
+            {
+                await _dispatcher.DispatchAsync(
+                    new CreateVaultCommand(_session.UserId!, password));
+            }
 
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
-                    {
-                        await Shell.Current.GoToAsync(nameof(VaultPage));
-                    });
-                },
-                () => _isUnlocking,
-                busy =>
-                {
-                    _isUnlocking = busy;
-                    UnlockButton.IsEnabled = !busy;
-                }
-            );
+            await this.FadeTo(0, 120, Easing.CubicIn);
+            await Shell.Current.GoToAsync(nameof(VaultPage), animate: false);
+        }
+        catch (InvalidMasterPasswordException)
+        {
+            await LoadingOverlay.HideAsync();
+            StatusLabel.Text = "Invalid master password.";
+            StatusLabel.IsVisible = true;
+            return;
+        }
+        catch (ArgumentException ex)
+        {
+            await LoadingOverlay.HideAsync();
+            StatusLabel.Text = ex.Message;
+            StatusLabel.IsVisible = true;
+            return;
+        }
+        catch (VaultNotFoundException)
+        {
+            // Vault disappeared between the existence check and the unlock attempt.
+            _vaultExists = false;
+            TitleLabel.Text = "No Vault Found";
+            SubtitleLabel.Text = "Set a master password to create your vault (min. 12 characters)";
+            UnlockButton.Text = "Create";
+            await LoadingOverlay.HideAsync();
+            StatusLabel.Text = "No vault found. Please create one.";
+            StatusLabel.IsVisible = true;
+            return;
         }
         catch (Exception ex)
         {
-            //TODO: Setup Logging system
-            System.Diagnostics.Debug.WriteLine($"Unlock failed: {ex.Message}");
-
-            StatusLabel.Text = "Invalid password";
+            Debug.WriteLine(ex);
+            StatusLabel.Text = "Something went wrong.";
             StatusLabel.IsVisible = true;
         }
         finally
         {
             MasterPasswordEntry.Text = string.Empty;
+
             await LoadingOverlay.HideAsync();
+
+            IsBusy = false;
         }
     }
 }

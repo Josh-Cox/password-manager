@@ -3,7 +3,9 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:PasswordManager.UI"
-    Title="PasswordManager">
+    Title="PasswordManager"
+    BackgroundColor="#231F20"
+    Shell.BackgroundColor="#231F20">
 
     <ShellContent
         Route="Loading"

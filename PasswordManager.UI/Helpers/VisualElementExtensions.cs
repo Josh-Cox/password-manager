@@ -8,6 +8,7 @@ public static class VisualElementExtensions
         this VisualElement view,
         uint duration = 150)
     {
+        view.IsVisible = true;
         view.InputTransparent = false;
         await view.FadeToAsync(1, duration);
     }
@@ -18,18 +19,21 @@ public static class VisualElementExtensions
     {
         await view.FadeToAsync(0, duration);
         view.InputTransparent = true;
+        view.IsVisible = false;
     }
 
     public static Task ShowAsync(this VisualElement view)
     {
-        view.Opacity = 1;
         view.IsVisible = true;
+        view.Opacity = 1;
+        view.InputTransparent = false;
         return Task.CompletedTask;
     }
 
     public static Task HideAsync(this VisualElement view)
     {
         view.IsVisible = false;
+        view.InputTransparent = true;
         return Task.CompletedTask;
     }
 

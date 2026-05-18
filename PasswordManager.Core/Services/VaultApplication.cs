@@ -13,6 +13,14 @@ namespace PasswordManager.Core.Services
             _vaultService = vaultService;
         }
 
+        public Task<bool> VaultExistsAsync(string userID) =>
+            _vaultService.VaultExistsAsync(userID);
+
+        public async Task CreateVaultAsync(string userID, string masterPassword)
+        {
+            _session = await _vaultService.CreateVaultAsync(userID, masterPassword);
+        }
+
         public async Task<bool> LoadVaultAsync(string userID, string masterPassword)
         {
             var session = await _vaultService.LoadAsync(userID, masterPassword);

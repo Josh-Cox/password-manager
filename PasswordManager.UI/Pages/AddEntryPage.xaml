@@ -95,6 +95,7 @@
 
                 <!-- Secondary action -->
                 <Button
+                    x:Name="GenerateButton"
                     Text="Generate Password"
                     HeightRequest="42"
                     WidthRequest="300"
@@ -104,9 +105,9 @@
                     FontAttributes="None"
                     Clicked="OnGenerateClicked"/>
 
-                
                 <!-- Primary CTA -->
                 <Button
+                    x:Name="SaveButton"
                     Text="Save Entry"
                     HeightRequest="58"
                     MaximumWidthRequest="320"

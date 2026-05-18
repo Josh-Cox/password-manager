@@ -18,6 +18,7 @@
 
       <!-- Logout -->
       <Button
+        x:Name="LogoutButton"
         Grid.Row="1"
         Grid.Column="2"
         Style="{StaticResource LogoutButtonStyle}"
@@ -105,6 +106,7 @@
 
     <!-- FAB -->
     <Button
+      x:Name="AddButton"
       Text="+"
       Style="{StaticResource FloatingActionButtonStyle}"
       HorizontalOptions="End"
@@ -116,5 +118,25 @@
         <Shadow Brush="Black" Opacity="0.35" Radius="18" />
       </Button.Shadow>
     </Button>
+
+    <!-- Inline copy notification (used on Windows/macOS where Toast is unavailable) -->
+    <Border
+      x:Name="CopiedBanner"
+      IsVisible="False"
+      Opacity="0"
+      HorizontalOptions="Center"
+      VerticalOptions="Start"
+      Margin="0,16,0,0"
+      BackgroundColor="#1E293B"
+      StrokeThickness="0"
+      StrokeShape="RoundRectangle 8"
+      Padding="18,10"
+    >
+      <Label
+        x:Name="CopiedBannerLabel"
+        TextColor="White"
+        FontSize="14"
+      />
+    </Border>
   </Grid>
 </ContentPage>

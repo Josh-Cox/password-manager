@@ -1,4 +1,4 @@
-﻿using PasswordManager.UI.Helpers;
+using PasswordManager.UI.Helpers;
 using PasswordManager.UI.Services;
 
 namespace PasswordManager.UI;
@@ -16,9 +16,19 @@ public partial class LoginPage : ContentPage
         _session = session;
     }
 
+    protected override async void OnAppearing()
+    {
+        Opacity = 0;
+        base.OnAppearing();
+        await this.FadeTo(1, 200, Easing.CubicOut);
+    }
+
     // <================ Button Events ================> //
     private async void OnSignInClicked(object sender, EventArgs e)
     {
+        if (_isSigningIn)
+            return;
+
         try
         {
             await AsyncOperationHelper.RunAsync(
@@ -31,9 +41,10 @@ public partial class LoginPage : ContentPage
 
                     var result = await _auth.LoginAsync();
 
-                    _session.UserId = result.Account?.HomeAccountId?.Identifier ?? string.Empty;
+                    _session.UserId = UserIdentityHelper.GetStableUserId(result);
 
-                    await Shell.Current.GoToAsync($"//{nameof(UnlockPage)}");
+                    await this.FadeTo(0, 120, Easing.CubicIn);
+                    await Shell.Current.GoToAsync($"//{nameof(UnlockPage)}", animate: false);
                 },
                 () => _isSigningIn,
                 busy =>
@@ -45,7 +56,6 @@ public partial class LoginPage : ContentPage
         }
         catch
         {
-            //TODO: Logging
             StatusLabel.Text = "Unable to sign in.";
             StatusLabel.IsVisible = true;
         }

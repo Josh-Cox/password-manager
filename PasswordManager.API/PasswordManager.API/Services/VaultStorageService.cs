@@ -13,12 +13,18 @@ namespace PasswordManager.API.Services
             _container.CreateIfNotExists();
         }
 
+        public async Task<bool> VaultExistsAsync(string userId)
+        {
+            var blob = _container.GetBlobClient($"{userId}.dat");
+            return await blob.ExistsAsync();
+        }
+
         public async Task<byte[]?> GetVaultAsync(string userId)
         {
             var blob = _container.GetBlobClient($"{userId}.dat");
 
-            //if (!await blob.ExistsAsync())
-            //    return null;
+            if (!await blob.ExistsAsync())
+                return null;
 
             var response = await blob.DownloadContentAsync();
             return response.Value.Content.ToArray();

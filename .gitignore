@@ -11,6 +11,9 @@ publish/
 ########################################
 *.env
 *.keystore
+*.claude
+AGENTS.md
+CLAUDE.md
 
 ########################################
 # User / IDE files

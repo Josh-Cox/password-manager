@@ -10,7 +10,11 @@ public static class UserIdentityHelper
 {
     public static string GetStableUserId(AuthenticationResult result)
     {
-        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(result.IdToken);
+        var token = !string.IsNullOrWhiteSpace(result.AccessToken)
+            ? result.AccessToken
+            : result.IdToken;
+
+        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
 
         var oid = jwt.Claims.FirstOrDefault(c => c.Type == "oid")?.Value;
         if (!string.IsNullOrWhiteSpace(oid))

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-
-namespace PasswordManager.Core.Services
+﻿namespace PasswordManager.Core.Services
 {
     public class ApiVaultStore : IVaultStore
     {
@@ -14,13 +9,26 @@ namespace PasswordManager.Core.Services
             _client = client;
         }
 
+        public async Task<bool> ExistsAsync(string userId)
+        {
+            using var response = await _client.GetAsync("/vault/me/exists");
+
+            System.Diagnostics.Debug.WriteLine($"HTTP Response: {response.StatusCode}");
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return false;
+
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+
         public async Task<byte[]?> ReadAllAsync(string userId)
         {
-            var response = await _client.GetAsync($"/vault/{userId}");
+            var response = await _client.GetAsync("/vault/me");
 
-            if (!response.IsSuccessStatusCode)
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return null;
 
+            response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsByteArrayAsync();
         }
 
@@ -32,21 +40,10 @@ namespace PasswordManager.Core.Services
                 new System.Net.Http.Headers.MediaTypeHeaderValue(
                     "application/octet-stream");
 
-            var response =
-                await _client.PostAsync($"/vault/{userId}", content);
-
-            var text = await response.Content.ReadAsStringAsync();
-
-            Debug.WriteLine($"UPLOAD STATUS: {response.StatusCode}");
-            Debug.WriteLine($"UPLOAD RESPONSE: {text}");
+            var response = await _client.PostAsync("/vault/me", content);
 
             response.EnsureSuccessStatusCode();
         }
 
-        //public async Task<bool> ExistsAsync(string userId)
-        //{
-        //    var response = await _client.GetAsync($"/vault/{userId}");
-        //    return response.IsSuccessStatusCode;
-        //}
     }
 }

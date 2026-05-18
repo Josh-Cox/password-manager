@@ -8,6 +8,8 @@ public class AuthService
     private readonly IPublicClientApplication _app;
     private readonly string[] _scopes;
     private IAccount? _cachedAccount;
+    private string? _cachedAccessToken;
+    private DateTimeOffset _cachedAccessTokenExpiresOn;
     private readonly UserSession _session;
 
     public AuthService(
@@ -63,16 +65,23 @@ public class AuthService
     public async Task<AuthenticationResult?> GetSilentAccountAsync()
     {
         var accounts = await _app.GetAccountsAsync();
-        var account = accounts.FirstOrDefault();
+        var account = _cachedAccount ?? accounts.FirstOrDefault();
 
         if (account == null)
             return null;
 
         try
         {
-            return await _app
+            var result = await _app
                 .AcquireTokenSilent(_scopes, account)
                 .ExecuteAsync();
+
+            _cachedAccount = result.Account;
+            _cachedAccessToken = result.AccessToken;
+            _cachedAccessTokenExpiresOn = result.ExpiresOn;
+            _session.UserId = UserIdentityHelper.GetStableUserId(result);
+
+            return result;
         }
         catch (MsalUiRequiredException)
         {
@@ -98,6 +107,8 @@ public class AuthService
         var result = await builder.ExecuteAsync();
 
         _cachedAccount = result.Account;
+        _cachedAccessToken = result.AccessToken;
+        _cachedAccessTokenExpiresOn = result.ExpiresOn;
 
         _session.UserId =
             UserIdentityHelper.GetStableUserId(result);
@@ -106,6 +117,18 @@ public class AuthService
     $"STABLE USER ID: {_session.UserId}");
 
         return result;
+    }
+
+    public async Task<string?> GetAccessTokenAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(_cachedAccessToken)
+            && _cachedAccessTokenExpiresOn > DateTimeOffset.UtcNow.AddMinutes(5))
+        {
+            return _cachedAccessToken;
+        }
+
+        var result = await GetSilentAccountAsync();
+        return result?.AccessToken;
     }
 
     public async Task LogoutAsync()
@@ -118,5 +141,7 @@ public class AuthService
         }
 
         _cachedAccount = null;
+        _cachedAccessToken = null;
+        _cachedAccessTokenExpiresOn = default;
     }
 }

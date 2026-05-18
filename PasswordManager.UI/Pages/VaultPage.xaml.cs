@@ -5,6 +5,7 @@ using PasswordManager.Core.Com.Commands;
 using PasswordManager.Core.Com.Queries;
 using PasswordManager.Core.Models;
 using PasswordManager.Core.Services;
+using PasswordManager.UI.Helpers;
 using PasswordManager.UI.Services;
 
 namespace PasswordManager.UI;
@@ -16,6 +17,7 @@ public partial class VaultPage : ContentPage
     private readonly AuthService _auth;
 
     private ObservableCollection<PasswordEntry> _entries = new();
+    private bool _isBusy;
 
     public VaultPage(CommandDispatcher dispatcher, UserSession session, AuthService auth)
     {
@@ -28,29 +30,20 @@ public partial class VaultPage : ContentPage
 
     private string UserId => _session.UserId!;
 
-    protected override async void OnAppearing()
+    private void SetBusy(bool busy)
     {
-        base.OnAppearing();
-
-        try
-        {
-            //DebugLabel.Text = $"User: {_session.UserId}";
-
-            await LoadEntries();
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlertAsync("VaultPage Error", ex.ToString(), "OK");
-        }
+        _isBusy = busy;
+        EntriesList.IsEnabled = !busy;
+        AddButton.IsEnabled = !busy;
+        LogoutButton.IsEnabled = !busy;
     }
 
-    //TODO: Secure toast pop-ups
-    //TODO: Helpers class
-    private async Task ShowToast(string message)
+    protected override async void OnAppearing()
     {
-        var toast = Toast.Make(message, ToastDuration.Short, 14);
-
-        await toast.Show();
+        Opacity = 0;
+        base.OnAppearing();
+        await LoadEntries();
+        await this.FadeTo(1, 200, Easing.CubicOut);
     }
 
     private async Task LoadEntries()
@@ -65,64 +58,73 @@ public partial class VaultPage : ContentPage
         }
         catch (Exception ex)
         {
-            //TODO: Setup Logging system
-            await DisplayAlertAsync("LoadEntries Error", ex.ToString(), "OK");
+            await DisplayAlert("Error", ex.Message, "OK");
         }
     }
 
-    //TODO: Create central events dispatcher
+    private async Task ShowToast(string message)
+    {
+#if ANDROID || IOS || MACCATALYST
+        var toast = Toast.Make(message, ToastDuration.Short, 14);
+        await toast.Show();
+#else
+        CopiedBannerLabel.Text = message;
+        CopiedBanner.IsVisible = true;
+        CopiedBanner.Opacity = 0;
+        await CopiedBanner.FadeToAsync(1, 150);
+        await Task.Delay(1200);
+        await CopiedBanner.FadeToAsync(0, 300);
+        CopiedBanner.IsVisible = false;
+#endif
+    }
 
     // <================ Button Events ================> //
+
     private async void OnEntryTapped(object sender, TappedEventArgs e)
     {
+        if (_isBusy) return;
+
         var entry = e.Parameter as PasswordEntry;
         if (entry == null)
             return;
 
         await Clipboard.Default.SetTextAsync(entry.Password);
-
         await ShowToast($"{entry.Site} password copied");
     }
 
     private async void OnAddEntryClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync(nameof(AddEntryPage));
-    }
+        if (_isBusy) return;
 
-    private async void OnCopyClicked(object sender, EventArgs e)
-    {
-        var button = (Button)sender;
-
-        var entry = (PasswordEntry)button.BindingContext;
-
-        await Clipboard.Default.SetTextAsync(entry.Password);
-
-        await DisplayAlertAsync("Copied", $"{entry.Site} password copied", "OK");
+        await this.FadeTo(0, 120, Easing.CubicIn);
+        await Shell.Current.GoToAsync(nameof(AddEntryPage), animate: false);
     }
 
     private async void OnEditEntryClicked(object sender, EventArgs e)
     {
-        var button = (ImageButton)sender;
+        if (_isBusy) return;
 
+        var button = (ImageButton)sender;
         var entry = button.CommandParameter as PasswordEntry;
         if (entry == null)
             return;
 
         var route = $"{nameof(AddEntryPage)}?site={Uri.EscapeDataString(entry.Site)}";
 
-        await Shell.Current.GoToAsync(route);
+        await this.FadeTo(0, 120, Easing.CubicIn);
+        await Shell.Current.GoToAsync(route, animate: false);
     }
 
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
     {
-        var button = (ImageButton)sender;
+        if (_isBusy) return;
 
+        var button = (ImageButton)sender;
         var entry = button.CommandParameter as PasswordEntry;
         if (entry == null)
             return;
 
-        //TODO: Logging
-        bool confirm = await DisplayAlertAsync(
+        bool confirm = await DisplayAlert(
             "Delete Entry",
             $"Delete {entry.Site}?",
             "Delete",
@@ -132,20 +134,30 @@ public partial class VaultPage : ContentPage
         if (!confirm)
             return;
 
-        await _dispatcher.DispatchAsync(new DeleteEntryCommand(UserId, entry));
-
-        await LoadEntries();
+        SetBusy(true);
+        try
+        {
+            await _dispatcher.DispatchAsync(new DeleteEntryCommand(UserId, entry));
+            await LoadEntries();
+        }
+        finally
+        {
+            SetBusy(false);
+        }
     }
 
     private async void OnLogoutClicked(object sender, EventArgs e)
     {
+        if (_isBusy) return;
+
         try
         {
             await _auth.LogoutAsync();
 
             _session.UserId = null;
 
-            await Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
+            await this.FadeTo(0, 120, Easing.CubicIn);
+            await Shell.Current.GoToAsync($"//{nameof(LoginPage)}", animate: false);
         }
         catch (Exception ex)
         {
@@ -154,6 +166,7 @@ public partial class VaultPage : ContentPage
     }
 
     // <================ Search Events ================> //
+
     private void OnSearchChanged(object sender, TextChangedEventArgs e)
     {
         var search = e.NewTextValue?.ToLower() ?? "";

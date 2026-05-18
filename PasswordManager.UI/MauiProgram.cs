@@ -39,11 +39,6 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<UserSession>();
 
-        builder.Services.AddSingleton(new HttpClient
-        {
-            BaseAddress = new Uri(config["Api:BaseUrl"]!)
-        });
-
         builder.Services.AddSingleton<AuthService>(sp =>
         {
             var auth = config.GetSection("Auth");
@@ -57,6 +52,22 @@ public static class MauiProgram
                 auth["Scope"]!,
                 session
             );
+        });
+
+        builder.Services.AddTransient<AuthenticatedHttpMessageHandler>();
+
+        builder.Services.AddSingleton(sp =>
+        {
+            var authHandler =
+                sp.GetRequiredService<AuthenticatedHttpMessageHandler>();
+
+            authHandler.InnerHandler = new HttpClientHandler();
+
+            return new HttpClient(authHandler)
+            {
+                BaseAddress = new Uri(config["Api:BaseUrl"]!),
+                Timeout = TimeSpan.FromSeconds(15)
+            };
         });
 
 
@@ -73,6 +84,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<GeneratePasswordHandler>();
         builder.Services.AddSingleton<GetEntriesHandler>();
         builder.Services.AddSingleton<LoadVaultHandler>();
+        builder.Services.AddSingleton<CreateVaultHandler>();
+        builder.Services.AddSingleton<VaultExistsHandler>();
         builder.Services.AddSingleton<SessionService>();
 
         builder.Services.AddSingleton<CommandDispatcher>();

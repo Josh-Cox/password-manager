@@ -1,9 +1,6 @@
 ﻿using PasswordManager.Core.Com.Commands;
 using PasswordManager.Core.Com.Interfaces;
 using PasswordManager.Core.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace PasswordManager.Core.Com.Handlers
 {
@@ -21,7 +18,7 @@ namespace PasswordManager.Core.Com.Handlers
             var ok = await _app.LoadVaultAsync(command.UserID, command.MasterPassword);
 
             if (!ok)
-                throw new UnauthorizedAccessException("Invalid password");
+                throw new InvalidMasterPasswordException();
         }
     }
 }

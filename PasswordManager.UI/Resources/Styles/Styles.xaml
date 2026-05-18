@@ -92,7 +92,7 @@
     <Setter Property="BackgroundColor" Value="{StaticResource LoadingOverlayColor}" />
     <Setter Property="Opacity" Value="0" />
     <Setter Property="IsVisible" Value="False" />
-    <Setter Property="InputTransparent" Value="True" />
+    <Setter Property="InputTransparent" Value="False" />
   </Style>
 
   <!-- Activity Indicator -->
