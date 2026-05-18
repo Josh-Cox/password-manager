@@ -14,7 +14,7 @@ publish/
 *.claude
 AGENTS.md
 CLAUDE.md
-*/appsettings.json
+**/appsettings.json
 
 ########################################
 # User / IDE files
