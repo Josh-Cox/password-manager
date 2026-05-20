@@ -45,8 +45,9 @@ builder.Services.AddAuthorization();
 builder.Services.AddSingleton<VaultStorageService>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
-    var conn = config["AzureBlobStorage"];
-    return new VaultStorageService(conn);
+    var url = config["AzureStorageAccountUrl"]
+        ?? throw new InvalidOperationException("AzureStorageAccountUrl is not configured.");
+    return new VaultStorageService(url);
 });
 
 var app = builder.Build();

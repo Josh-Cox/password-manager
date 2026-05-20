@@ -1,3 +1,4 @@
+using Azure.Identity;
 using Azure.Storage.Blobs;
 
 namespace PasswordManager.API.Services
@@ -6,9 +7,10 @@ namespace PasswordManager.API.Services
     {
         private readonly BlobContainerClient _container;
 
-        public VaultStorageService(string connectionString)
+        public VaultStorageService(string storageAccountUrl)
         {
-            var client = new BlobServiceClient(connectionString);
+            var credential = new DefaultAzureCredential();
+            var client = new BlobServiceClient(new Uri(storageAccountUrl), credential);
             _container = client.GetBlobContainerClient("vaults");
             _container.CreateIfNotExists();
         }

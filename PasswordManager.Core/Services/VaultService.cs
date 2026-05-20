@@ -70,7 +70,7 @@ namespace PasswordManager.Core.Services
             string json = Encoding.UTF8.GetString(decrypted);
 
             var entries =
-                JsonSerializer.Deserialize<ObservableCollection<PasswordEntry>>(json)
+                JsonSerializer.Deserialize(json, VaultJsonContext.Default.ObservableCollectionPasswordEntry)
                 ?? new ObservableCollection<PasswordEntry>();
 
             return new VaultSession
@@ -84,7 +84,7 @@ namespace PasswordManager.Core.Services
 
         public async Task SaveAsync(string userID, VaultSession session)
         {
-            string json = JsonSerializer.Serialize(session.Entries);
+            string json = JsonSerializer.Serialize(session.Entries, VaultJsonContext.Default.ObservableCollectionPasswordEntry);
 
             byte[] key = session.CachedKey
                 ?? await Task.Run(() => _crypto.DeriveKey(session.MasterPassword, session.Salt));
