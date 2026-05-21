@@ -1,4 +1,6 @@
+using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Graph;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using PasswordManager.API.Services;
@@ -48,6 +50,20 @@ builder.Services.AddSingleton<VaultStorageService>(sp =>
     var url = config["AzureStorageAccountUrl"]
         ?? throw new InvalidOperationException("AzureStorageAccountUrl is not configured.");
     return new VaultStorageService(url);
+});
+
+builder.Services.AddSingleton<GraphServiceClient>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var tenantId = config["Graph:TenantId"]
+        ?? throw new InvalidOperationException("Graph:TenantId is not configured.");
+    var clientId = config["Graph:ClientId"]
+        ?? throw new InvalidOperationException("Graph:ClientId is not configured.");
+    var clientSecret = config["Graph:ClientSecret"]
+        ?? throw new InvalidOperationException("Graph:ClientSecret is not configured.");
+
+    var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+    return new GraphServiceClient(credential);
 });
 
 var app = builder.Build();

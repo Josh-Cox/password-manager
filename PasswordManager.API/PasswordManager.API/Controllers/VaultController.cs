@@ -110,6 +110,17 @@ namespace PasswordManager.API.Controllers
             return Ok();
         }
 
+        [HttpDelete("me")]
+        public async Task<IActionResult> DeleteCurrentUserVault()
+        {
+            var userId = GetCurrentUserId();
+            if (string.IsNullOrWhiteSpace(userId))
+                return Forbid();
+
+            await _storage.DeleteVaultAsync(userId);
+            return Ok();
+        }
+
         private bool IsCurrentUser(string requestedUserId)
         {
             var authenticatedUserId = GetCurrentUserId();

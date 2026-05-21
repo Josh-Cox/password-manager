@@ -39,5 +39,11 @@ namespace PasswordManager.API.Services
             using var ms = new MemoryStream(data);
             await blob.UploadAsync(ms, overwrite: true);
         }
+
+        public async Task DeleteVaultAsync(string userId)
+        {
+            var blob = _container.GetBlobClient($"{userId}.dat");
+            await blob.DeleteIfExistsAsync();
+        }
     }
 }

@@ -98,9 +98,37 @@ public partial class VaultPage : ContentPage
         }
     }
 
-    private void OnMenuDeleteAccountClicked(object sender, EventArgs e)
+    private async void OnMenuDeleteAccountClicked(object sender, EventArgs e)
     {
-        // Placeholder — not yet implemented
+        if (_isBusy) return;
+
+        bool confirm = await DisplayAlert(
+            "Delete Account",
+            "This will permanently delete your vault and your account. This cannot be undone.",
+            "Delete",
+            "Cancel"
+        );
+
+        if (!confirm) return;
+
+        SetBusy(true);
+        try
+        {
+            await _dispatcher.DispatchAsync(new DeleteAccountCommand(UserId));
+            await _auth.LogoutAsync();
+            _session.UserId = null;
+            await this.FadeTo(0, 120, Easing.CubicIn);
+            await Shell.Current.GoToAsync($"//{nameof(LoginPage)}", animate: false);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Delete account error: {ex.Message}");
+            await DisplayAlert("Error", "Failed to delete account. Please try again.", "OK");
+        }
+        finally
+        {
+            SetBusy(false);
+        }
     }
 
     private async void OnEntryTapped(object sender, TappedEventArgs e)

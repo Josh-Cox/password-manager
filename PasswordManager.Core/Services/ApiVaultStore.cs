@@ -45,5 +45,10 @@
             response.EnsureSuccessStatusCode();
         }
 
+        public async Task DeleteAsync(string userId)
+        {
+            var response = await _client.DeleteAsync("/vault/me");
+            response.EnsureSuccessStatusCode();
+        }
     }
 }

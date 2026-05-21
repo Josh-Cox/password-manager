@@ -9,5 +9,6 @@ namespace PasswordManager.Core.Services
         Task<bool> ExistsAsync(string userId);
         Task<byte[]?> ReadAllAsync(string userId);
         Task WriteAllAsync(string userId, byte[] data);
+        Task DeleteAsync(string userId);
     }
 }

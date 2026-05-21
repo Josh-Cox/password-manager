@@ -17,6 +17,7 @@ namespace PasswordManager.Core.Services
         public CommandDispatcher(
             AddEntryHandler addHandler,
             DeleteEntryHandler deleteHandler,
+            DeleteAccountHandler deleteAccountHandler,
             LoadVaultHandler loadVaultHandler,
             CreateVaultHandler createVaultHandler,
             GeneratePasswordHandler generateHandler,
@@ -32,6 +33,10 @@ namespace PasswordManager.Core.Services
                 {
                     typeof(DeleteEntryCommand),
                     command => deleteHandler.HandleAsync((DeleteEntryCommand)command)
+                },
+                {
+                    typeof(DeleteAccountCommand),
+                    command => deleteAccountHandler.HandleAsync((DeleteAccountCommand)command)
                 },
                 {
                     typeof(LoadVaultCommand),

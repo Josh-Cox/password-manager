@@ -102,9 +102,34 @@ public partial class UnlockPage : ContentPage, INotifyPropertyChanged
         await _sessionService.LogoutAsync();
     }
 
-    private void OnMenuDeleteAccountClicked(object sender, EventArgs e)
+    private async void OnMenuDeleteAccountClicked(object sender, EventArgs e)
     {
-        // Placeholder — not yet implemented
+        if (_isBusy) return;
+
+        bool confirm = await DisplayAlert(
+            "Delete Account",
+            "This will permanently delete your vault and your account. This cannot be undone.",
+            "Delete",
+            "Cancel"
+        );
+
+        if (!confirm) return;
+
+        IsBusy = true;
+        try
+        {
+            await _dispatcher.DispatchAsync(new DeleteAccountCommand(_session.UserId!));
+            await _sessionService.LogoutAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Delete account error: {ex.Message}");
+            await DisplayAlert("Error", "Failed to delete account. Please try again.", "OK");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
 

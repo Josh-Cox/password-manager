@@ -80,9 +80,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<IVaultStore, ApiVaultStore>();
         builder.Services.AddSingleton<VaultService>();
         builder.Services.AddSingleton<VaultApplication>();
+        builder.Services.AddSingleton<ApiAccountService>();
 
         builder.Services.AddSingleton<AddEntryHandler>();
         builder.Services.AddSingleton<DeleteEntryHandler>();
+        builder.Services.AddSingleton<DeleteAccountHandler>();
         builder.Services.AddSingleton<GeneratePasswordHandler>();
         builder.Services.AddSingleton<GetEntriesHandler>();
         builder.Services.AddSingleton<LoadVaultHandler>();
