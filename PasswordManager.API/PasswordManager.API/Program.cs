@@ -69,7 +69,7 @@ builder.Services.AddSingleton<GraphServiceClient>(sp =>
 var app = builder.Build();
 
 // Middleware pipeline
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();;
 
 app.UseAuthentication();
 app.UseAuthorization();

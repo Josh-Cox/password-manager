@@ -1,5 +1,6 @@
-﻿using Microsoft.Identity.Client;
+using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Extensions.Msal;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace PasswordManager.UI.Services;
 
@@ -7,19 +8,15 @@ public class AuthService
 {
     private readonly IPublicClientApplication _app;
     private readonly string[] _scopes;
+    private readonly UserSession _session;
+
     private IAccount? _cachedAccount;
     private string? _cachedAccessToken;
     private DateTimeOffset _cachedAccessTokenExpiresOn;
-    private readonly UserSession _session;
 
-    public AuthService(
-    string clientId,
-    string tenantId,
-    string scope,
-    UserSession session)
+    public AuthService(string clientId, string tenantId, string scope, UserSession session)
     {
-        var authority =
-            $"https://{tenantId}.ciamlogin.com/{tenantId}/PasswordManagerSignIn";
+        var authority = $"https://{tenantId}.ciamlogin.com/{tenantId}/PasswordManagerSignIn";
 
 #if ANDROID
         _app = PublicClientApplicationBuilder
@@ -30,18 +27,16 @@ public class AuthService
 #endif
 #if WINDOWS
         _app = PublicClientApplicationBuilder
-                    .Create(clientId)
-                    .WithAuthority(authority)
-                    .WithRedirectUri("http://localhost")
-                    .Build();
+            .Create(clientId)
+            .WithAuthority(authority)
+            .WithRedirectUri("http://localhost")
+            .Build();
+
+        ConfigureTokenCache();
 #endif
 
         _scopes = new[] { scope };
         _session = session;
-
-#if WINDOWS
-        ConfigureTokenCache();
-#endif
     }
 
 #if WINDOWS
@@ -62,6 +57,9 @@ public class AuthService
     }
 #endif
 
+    // Attempts login from the MSAL token cache — no UI shown.
+    // Returns null if the user needs to log in interactively.
+    // Sets UserId on success.
     public async Task<AuthenticationResult?> GetSilentAccountAsync()
     {
         var accounts = await _app.GetAccountsAsync();
@@ -76,11 +74,7 @@ public class AuthService
                 .AcquireTokenSilent(_scopes, account)
                 .ExecuteAsync();
 
-            _cachedAccount = result.Account;
-            _cachedAccessToken = result.AccessToken;
-            _cachedAccessTokenExpiresOn = result.ExpiresOn;
-            _session.UserId = UserIdentityHelper.GetStableUserId(result);
-
+            StoreResult(result);
             return result;
         }
         catch (MsalUiRequiredException)
@@ -89,36 +83,28 @@ public class AuthService
         }
     }
 
+    // Shows the Entra login page. Sets UserId on success.
     public async Task<AuthenticationResult> LoginAsync()
     {
 #if ANDROID
-                var activity = Platform.CurrentActivity;
+        var activity = Platform.CurrentActivity;
 #endif
 
-                var builder = _app
-                    .AcquireTokenInteractive(_scopes)
-                    .WithUseEmbeddedWebView(false)
-                    .WithPrompt(Prompt.SelectAccount);
+        var builder = _app
+            .AcquireTokenInteractive(_scopes)
+            .WithUseEmbeddedWebView(false)
+            .WithPrompt(Prompt.SelectAccount);
 
 #if ANDROID
-                builder = builder.WithParentActivityOrWindow(activity);
+        builder = builder.WithParentActivityOrWindow(activity);
 #endif
 
         var result = await builder.ExecuteAsync();
-
-        _cachedAccount = result.Account;
-        _cachedAccessToken = result.AccessToken;
-        _cachedAccessTokenExpiresOn = result.ExpiresOn;
-
-        _session.UserId =
-            UserIdentityHelper.GetStableUserId(result);
-
-        System.Diagnostics.Debug.WriteLine(
-    $"STABLE USER ID: {_session.UserId}");
-
+        StoreResult(result);
         return result;
     }
 
+    // Returns a valid access token, refreshing silently if needed.
     public async Task<string?> GetAccessTokenAsync()
     {
         if (!string.IsNullOrWhiteSpace(_cachedAccessToken)
@@ -131,17 +117,45 @@ public class AuthService
         return result?.AccessToken;
     }
 
+    // Clears all MSAL accounts and the cached token. Does NOT navigate.
     public async Task LogoutAsync()
     {
         var accounts = await _app.GetAccountsAsync();
 
         foreach (var account in accounts)
-        {
             await _app.RemoveAsync(account);
-        }
 
         _cachedAccount = null;
         _cachedAccessToken = null;
         _cachedAccessTokenExpiresOn = default;
+    }
+
+    // Caches the token result and writes UserId into the shared session.
+    // This is the single place in the app that sets UserId.
+    private void StoreResult(AuthenticationResult result)
+    {
+        _cachedAccount = result.Account;
+        _cachedAccessToken = result.AccessToken;
+        _cachedAccessTokenExpiresOn = result.ExpiresOn;
+        _session.UserId = ExtractUserId(result);
+    }
+
+    private static string ExtractUserId(AuthenticationResult result)
+    {
+        var token = !string.IsNullOrWhiteSpace(result.AccessToken)
+            ? result.AccessToken
+            : result.IdToken;
+
+        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
+
+        var oid = jwt.Claims.FirstOrDefault(c => c.Type == "oid")?.Value;
+        if (!string.IsNullOrWhiteSpace(oid))
+            return oid;
+
+        var sub = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+        if (!string.IsNullOrWhiteSpace(sub))
+            return sub;
+
+        throw new InvalidOperationException("No stable user ID found in token.");
     }
 }

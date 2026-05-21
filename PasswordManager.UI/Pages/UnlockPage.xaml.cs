@@ -27,8 +27,11 @@ public partial class UnlockPage : ContentPage, INotifyPropertyChanged
         {
             _isBusy = value;
             OnPropertyChanged(nameof(IsBusy));
+            OnPropertyChanged(nameof(CanUnlock));
         }
     }
+
+    public bool CanUnlock => !_isBusy;
 
     public UnlockPage(
         CommandDispatcher dispatcher,
@@ -53,12 +56,32 @@ public partial class UnlockPage : ContentPage, INotifyPropertyChanged
         base.OnAppearing();
 
         StatusLabel.Text = string.Empty;
+        StatusLabel.IsVisible = false;
         MasterPasswordEntry.Text = string.Empty;
+        UnlockButton.IsEnabled = false;
+
+        // Fade in immediately so the transition feels instant.
+        // Check vault existence in parallel — UI updates when ready.
+        await this.FadeTo(1, 200, Easing.CubicOut);
 
         try
         {
             _vaultExists = await _dispatcher.DispatchAsync(
                 new VaultExistsQuery(_session.UserId!));
+
+            if (_vaultExists)
+            {
+                TitleLabel.Text = "Unlock Vault";
+                SubtitleLabel.Text = "Enter your master password";
+                UnlockButton.Text = "Unlock";
+            }
+            else
+            {
+                TitleLabel.Text = "No Vault Found";
+                SubtitleLabel.Text = "Set a master password to create your vault (min. 12 characters)";
+                UnlockButton.Text = "Create";
+            }
+
             UnlockButton.IsEnabled = true;
         }
         catch (HttpRequestException ex)
@@ -72,24 +95,7 @@ public partial class UnlockPage : ContentPage, INotifyPropertyChanged
                 ? $"Unable to verify your account ({(int?)ex.StatusCode}). Please sign out and back in."
                 : "Unable to check vault status.";
             StatusLabel.IsVisible = true;
-            await this.FadeTo(1, 200, Easing.CubicOut);
-            return;
         }
-
-        if (_vaultExists)
-        {
-            TitleLabel.Text = "Unlock Vault";
-            SubtitleLabel.Text = "Enter your master password";
-            UnlockButton.Text = "Unlock";
-        }
-        else
-        {
-            TitleLabel.Text = "No Vault Found";
-            SubtitleLabel.Text = "Set a master password to create your vault (min. 12 characters)";
-            UnlockButton.Text = "Create";
-        }
-
-        await this.FadeTo(1, 200, Easing.CubicOut);
     }
 
     // <================ Button Events ================> //

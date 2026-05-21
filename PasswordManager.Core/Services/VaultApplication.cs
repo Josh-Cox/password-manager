@@ -70,5 +70,13 @@ namespace PasswordManager.Core.Services
         {
             return PasswordService.Generate(length);
         }
+
+        public void ClearSession()
+        {
+            if (_session?.CachedKey != null)
+                Array.Clear(_session.CachedKey, 0, _session.CachedKey.Length);
+
+            _session = null;
+        }
     }
 }

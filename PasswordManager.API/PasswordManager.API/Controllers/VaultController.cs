@@ -75,14 +75,17 @@ namespace PasswordManager.API.Controllers
             if (!IsCurrentUser(userId))
                 return Forbid();
 
+            const int MaxVaultBytes = 10 * 1024 * 1024; // 10 MB
+
             using var ms = new MemoryStream();
-
             await Request.Body.CopyToAsync(ms);
-
             var data = ms.ToArray();
 
             if (data.Length == 0)
                 return BadRequest("Empty vault upload.");
+
+            if (data.Length > MaxVaultBytes)
+                return BadRequest("Vault exceeds maximum allowed size.");
 
             await _storage.SaveVaultAsync(userId, data);
 
@@ -96,14 +99,17 @@ namespace PasswordManager.API.Controllers
             if (string.IsNullOrWhiteSpace(userId))
                 return Forbid();
 
+            const int MaxVaultBytes = 10 * 1024 * 1024; // 10 MB
+
             using var ms = new MemoryStream();
-
             await Request.Body.CopyToAsync(ms);
-
             var data = ms.ToArray();
 
             if (data.Length == 0)
                 return BadRequest("Empty vault upload.");
+
+            if (data.Length > MaxVaultBytes)
+                return BadRequest("Vault exceeds maximum allowed size.");
 
             await _storage.SaveVaultAsync(userId, data);
 

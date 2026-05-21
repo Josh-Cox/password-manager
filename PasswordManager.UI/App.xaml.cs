@@ -1,27 +1,21 @@
-﻿using PasswordManager.UI.Services;
+using PasswordManager.UI.Services;
 
 namespace PasswordManager.UI;
 
 public partial class App : Application
 {
     private readonly AuthService _auth;
-    private readonly UserSession _session;
 
-    public App(AuthService auth, UserSession session)
+    public App(AuthService auth)
     {
         InitializeComponent();
         _auth = auth;
-        _session = session;
-
-
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
         var window = new Window(new AppShell());
-
         _ = InitializeAsync();
-
         return window;
     }
 
@@ -31,24 +25,14 @@ public partial class App : Application
         {
             await Task.Delay(50);
 
+            // GetSilentAccountAsync sets UserId internally if successful.
             var result = await _auth.GetSilentAccountAsync();
 
-            if (result != null)
+            await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                _session.UserId = UserIdentityHelper.GetStableUserId(result);
-
-                await MainThread.InvokeOnMainThreadAsync(async () =>
-                {
-                    await Shell.Current.GoToAsync("//UnlockPage");
-                });
-            }
-            else
-            {
-                await MainThread.InvokeOnMainThreadAsync(async () =>
-                {
-                    await Shell.Current.GoToAsync("//LoginPage");
-                });
-            }
+                var route = result != null ? "//UnlockPage" : "//LoginPage";
+                await Shell.Current.GoToAsync(route);
+            });
         }
         catch (Exception ex)
         {

@@ -10,7 +10,7 @@ namespace PasswordManager.Core.Services
         private const int NonceSize = 12;
         private const int TagSize = 16;
         private const int KeySize = 32; // 256 bits
-        private const int Iterations = 50_000;
+        private const int Iterations = 600_000;
         private static readonly byte[] VaultMagic = Encoding.UTF8.GetBytes("PMGR1");
 
         public byte[] GenerateSalt()

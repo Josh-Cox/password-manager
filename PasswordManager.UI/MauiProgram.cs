@@ -6,7 +6,6 @@ using PasswordManager.Core.Services;
 using PasswordManager.UI.Services;
 using Microsoft.Maui.Platform;
 using Microsoft.Maui.Controls.Platform;
-using Android.OS;
 
 
 #if ANDROID
@@ -85,6 +84,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<AddEntryHandler>();
         builder.Services.AddSingleton<DeleteEntryHandler>();
         builder.Services.AddSingleton<DeleteAccountHandler>();
+        builder.Services.AddSingleton<ClearSessionHandler>();
         builder.Services.AddSingleton<GeneratePasswordHandler>();
         builder.Services.AddSingleton<GetEntriesHandler>();
         builder.Services.AddSingleton<LoadVaultHandler>();

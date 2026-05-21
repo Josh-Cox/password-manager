@@ -42,8 +42,8 @@ public partial class VaultPage : ContentPage
     {
         Opacity = 0;
         base.OnAppearing();
-        await LoadEntries();
         await this.FadeTo(1, 200, Easing.CubicOut);
+        await LoadEntries();
     }
 
     private async Task LoadEntries()
@@ -87,10 +87,11 @@ public partial class VaultPage : ContentPage
         if (_isBusy) return;
         try
         {
+            await _dispatcher.DispatchAsync(new ClearSessionCommand());
             await _auth.LogoutAsync();
             _session.UserId = null;
             await this.FadeTo(0, 120, Easing.CubicIn);
-            await Shell.Current.GoToAsync($"//{nameof(LoginPage)}", animate: false);
+            await Shell.Current.GoToAsync($"//{nameof(LoginPage)}?toast=logout", animate: false);
         }
         catch (Exception ex)
         {
@@ -115,10 +116,13 @@ public partial class VaultPage : ContentPage
         try
         {
             await _dispatcher.DispatchAsync(new DeleteAccountCommand(UserId));
+            await _dispatcher.DispatchAsync(new ClearSessionCommand());
             await _auth.LogoutAsync();
             _session.UserId = null;
             await this.FadeTo(0, 120, Easing.CubicIn);
+            await ShowToast("Account Deleted");
             await Shell.Current.GoToAsync($"//{nameof(LoginPage)}", animate: false);
+            
         }
         catch (Exception ex)
         {
@@ -194,25 +198,6 @@ public partial class VaultPage : ContentPage
         finally
         {
             SetBusy(false);
-        }
-    }
-
-    private async void OnLogoutClicked(object sender, EventArgs e)
-    {
-        if (_isBusy) return;
-
-        try
-        {
-            await _auth.LogoutAsync();
-
-            _session.UserId = null;
-
-            await this.FadeTo(0, 120, Easing.CubicIn);
-            await Shell.Current.GoToAsync($"//{nameof(LoginPage)}", animate: false);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Logout error: {ex.Message}");
         }
     }
 

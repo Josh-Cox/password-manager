@@ -18,6 +18,7 @@ namespace PasswordManager.Core.Services
             AddEntryHandler addHandler,
             DeleteEntryHandler deleteHandler,
             DeleteAccountHandler deleteAccountHandler,
+            ClearSessionHandler clearSessionHandler,
             LoadVaultHandler loadVaultHandler,
             CreateVaultHandler createVaultHandler,
             GeneratePasswordHandler generateHandler,
@@ -37,6 +38,10 @@ namespace PasswordManager.Core.Services
                 {
                     typeof(DeleteAccountCommand),
                     command => deleteAccountHandler.HandleAsync((DeleteAccountCommand)command)
+                },
+                {
+                    typeof(ClearSessionCommand),
+                    command => clearSessionHandler.HandleAsync((ClearSessionCommand)command)
                 },
                 {
                     typeof(LoadVaultCommand),
