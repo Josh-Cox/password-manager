@@ -94,12 +94,17 @@ public partial class UnlockPage : ContentPage, INotifyPropertyChanged
 
     // <================ Button Events ================> //
 
-    private async void OnLogoutClicked(object sender, EventArgs e)
-    {
-        if (_isBusy)
-            return;
+    private async void OnSettingsClicked(object sender, EventArgs e) => await SideMenu.OpenAsync();
 
+    private async void OnMenuLogoutClicked(object sender, EventArgs e)
+    {
+        if (_isBusy) return;
         await _sessionService.LogoutAsync();
+    }
+
+    private void OnMenuDeleteAccountClicked(object sender, EventArgs e)
+    {
+        // Placeholder — not yet implemented
     }
 
 

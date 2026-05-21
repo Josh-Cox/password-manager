@@ -35,7 +35,7 @@ public partial class VaultPage : ContentPage
         _isBusy = busy;
         EntriesList.IsEnabled = !busy;
         AddButton.IsEnabled = !busy;
-        LogoutButton.IsEnabled = !busy;
+        SettingsButton.IsEnabled = !busy;
     }
 
     protected override async void OnAppearing()
@@ -79,6 +79,29 @@ public partial class VaultPage : ContentPage
     }
 
     // <================ Button Events ================> //
+
+    private async void OnSettingsClicked(object sender, EventArgs e) => await SideMenu.OpenAsync();
+
+    private async void OnMenuLogoutClicked(object sender, EventArgs e)
+    {
+        if (_isBusy) return;
+        try
+        {
+            await _auth.LogoutAsync();
+            _session.UserId = null;
+            await this.FadeTo(0, 120, Easing.CubicIn);
+            await Shell.Current.GoToAsync($"//{nameof(LoginPage)}", animate: false);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Logout error: {ex.Message}");
+        }
+    }
+
+    private void OnMenuDeleteAccountClicked(object sender, EventArgs e)
+    {
+        // Placeholder — not yet implemented
+    }
 
     private async void OnEntryTapped(object sender, TappedEventArgs e)
     {

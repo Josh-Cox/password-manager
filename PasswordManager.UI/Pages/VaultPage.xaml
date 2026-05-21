@@ -1,142 +1,150 @@
 <ContentPage
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:controls="clr-namespace:PasswordManager.UI.Controls"
   x:Class="PasswordManager.UI.VaultPage"
   Style="{StaticResource PageBackgroundStyle}"
   Shell.NavBarIsVisible="False"
 >
-  <Grid Padding="24">
-    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="18">
-      <!-- Search -->
-      <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource PriamrySearchBarBorderStyle}">
-        <SearchBar
-          x:Name="SearchBar"
-          Style="{StaticResource PrimarySearchBarStyle}"
-          TextChanged="OnSearchChanged"
+  <!-- Outer grid has no padding so the SideMenu overlay covers the full screen -->
+  <Grid>
+    <Grid Padding="24">
+      <Grid RowDefinitions="Auto,Auto,*" RowSpacing="18">
+        <!-- Search -->
+        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource PriamrySearchBarBorderStyle}">
+          <SearchBar
+            x:Name="SearchBar"
+            Style="{StaticResource PrimarySearchBarStyle}"
+            TextChanged="OnSearchChanged"
+          />
+        </Border>
+
+        <!-- Settings button (replaces Logout — same position) -->
+        <ImageButton
+          x:Name="SettingsButton"
+          Grid.Row="1"
+          Grid.Column="2"
+          Source="icn_settings.svg"
+          HeightRequest="38"
+          WidthRequest="38"
+          HorizontalOptions="End"
+          VerticalOptions="Start"
+          Clicked="OnSettingsClicked"
         />
-      </Border>
 
-      <!-- Logout -->
-      <Button
-        x:Name="LogoutButton"
-        Grid.Row="1"
-        Grid.Column="2"
-        Style="{StaticResource LogoutButtonStyle}"
-        Clicked="OnLogoutClicked"
-      />
+        <!-- Entries -->
+        <CollectionView
+          Grid.Row="2"
+          x:Name="EntriesList"
+          SelectionMode="None"
+          VerticalScrollBarVisibility="Never"
+        >
+          <CollectionView.ItemTemplate>
+            <DataTemplate>
+              <Grid>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-      <!-- Entries -->
-      <CollectionView
-        Grid.Row="2"
-        x:Name="EntriesList"
-        SelectionMode="None"
-        VerticalScrollBarVisibility="Never"
-      >
-        <CollectionView.ItemTemplate>
-          <DataTemplate>
-            <Grid>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-              </Grid.RowDefinitions>
+                <!-- Content row -->
+                <Grid Padding="0,14" ColumnDefinitions="*,Auto,Auto" VerticalOptions="Center">
+                  <Grid.GestureRecognizers>
+                    <TapGestureRecognizer CommandParameter="{Binding .}" Tapped="OnEntryTapped" />
+                  </Grid.GestureRecognizers>
 
-              <!-- Content row -->
-              <Grid Padding="0,14" ColumnDefinitions="*,Auto,Auto" VerticalOptions="Center">
-                <Grid.GestureRecognizers>
-                  <TapGestureRecognizer CommandParameter="{Binding .}" Tapped="OnEntryTapped" />
-                </Grid.GestureRecognizers>
+                  <VerticalStackLayout Grid.Column="0" Spacing="2">
+                    <Label
+                      Text="{Binding Site}"
+                      Style="{StaticResource PrimaryLabelStyle}"
+                      FontAttributes="Bold"
+                      HorizontalOptions="Start"
+                      FontSize="22"
+                    />
+                    <Label
+                      Text="{Binding Username}"
+                      Style="{StaticResource SecondaryLabelStyle}"
+                      HorizontalOptions="Start"
+                      FontSize="14"
+                    />
+                  </VerticalStackLayout>
 
-                <VerticalStackLayout Grid.Column="0" Spacing="2">
-                  <Label
-                    Text="{Binding Site}"
-                    Style="{StaticResource PrimaryLabelStyle}"
-                    FontAttributes="Bold"
-                    HorizontalOptions="Start"
-                    FontSize="22"
-                  />
+                  <HorizontalStackLayout Grid.Column="1" Spacing="5">
+                    <ImageButton
+                      Padding="8"
+                      Source="icn_edit.svg"
+                      Style="{StaticResource PrimaryImageButtonStyle}"
+                      Clicked="OnEditEntryClicked"
+                      CommandParameter="{Binding .}"
+                    />
+                    <ImageButton
+                      Source="icn_remove.svg"
+                      Padding="8"
+                      Style="{StaticResource PrimaryImageButtonStyle}"
+                      Opacity="0.85"
+                      Clicked="OnDeleteButtonClicked"
+                      CommandParameter="{Binding .}"
+                    />
+                  </HorizontalStackLayout>
+                </Grid>
 
-                  <Label
-                    Text="{Binding Username}"
-                    Style="{StaticResource SecondaryLabelStyle}"
-                    HorizontalOptions="Start"
-                    FontSize="14"
-                  />
-                </VerticalStackLayout>
-
-                <HorizontalStackLayout Grid.Column="1" Spacing="5">
-                  <ImageButton
-                    Padding="8"
-                    Source="icn_edit.svg"
-                    Style="{StaticResource PrimaryImageButtonStyle}"
-                    Clicked="OnEditEntryClicked"
-                    CommandParameter="{Binding .}"
-                  />
-
-                  <ImageButton
-                    Source="icn_remove.svg"
-                    Padding="8"
-                    Style="{StaticResource PrimaryImageButtonStyle}"
-                    Opacity="0.85"
-                    Clicked="OnDeleteButtonClicked"
-                    CommandParameter="{Binding .}"
-                  />
-                </HorizontalStackLayout>
+                <!-- Divider -->
+                <BoxView Grid.Row="1" Style="{StaticResource PrimaryDividerStyle}" />
               </Grid>
+            </DataTemplate>
+          </CollectionView.ItemTemplate>
 
-              <!-- Divider with symmetric spacing -->
-              <BoxView Grid.Row="1" Style="{StaticResource PrimaryDividerStyle}" />
-            </Grid>
-          </DataTemplate>
-        </CollectionView.ItemTemplate>
+          <!-- Empty state -->
+          <CollectionView.EmptyView>
+            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="12">
+              <Label Text="No passwords yet" Style="{StaticResource PrimaryLabelStyle}" />
+              <Label
+                Text="Tap + to add your first password"
+                FontSize="15"
+                Style="{StaticResource SecondaryLabelStyle}"
+              />
+            </VerticalStackLayout>
+          </CollectionView.EmptyView>
+        </CollectionView>
+      </Grid>
 
-        <!-- Empty state -->
-        <CollectionView.EmptyView>
-          <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="12">
-            <Label Text="No passwords yet" Style="{StaticResource PrimaryLabelStyle}" />
+      <!-- FAB -->
+      <Button
+        x:Name="AddButton"
+        Text="+"
+        Style="{StaticResource FloatingActionButtonStyle}"
+        HorizontalOptions="End"
+        VerticalOptions="End"
+        Margin="24"
+        Clicked="OnAddEntryClicked"
+      >
+        <Button.Shadow>
+          <Shadow Brush="Black" Opacity="0.35" Radius="18" />
+        </Button.Shadow>
+      </Button>
 
-            <Label
-              Text="Tap + to add your first password"
-              FontSize="15"
-              Style="{StaticResource SecondaryLabelStyle}"
-            />
-          </VerticalStackLayout>
-        </CollectionView.EmptyView>
-      </CollectionView>
+      <!-- Inline copy notification (Windows/macOS fallback) -->
+      <Border
+        x:Name="CopiedBanner"
+        IsVisible="False"
+        Opacity="0"
+        HorizontalOptions="Center"
+        VerticalOptions="Start"
+        Margin="0,16,0,0"
+        BackgroundColor="#1E293B"
+        StrokeThickness="0"
+        StrokeShape="RoundRectangle 8"
+        Padding="18,10"
+      >
+        <Label x:Name="CopiedBannerLabel" TextColor="White" FontSize="14" />
+      </Border>
     </Grid>
 
-    <!-- FAB -->
-    <Button
-      x:Name="AddButton"
-      Text="+"
-      Style="{StaticResource FloatingActionButtonStyle}"
-      HorizontalOptions="End"
-      VerticalOptions="End"
-      Margin="24"
-      Clicked="OnAddEntryClicked"
-    >
-      <Button.Shadow>
-        <Shadow Brush="Black" Opacity="0.35" Radius="18" />
-      </Button.Shadow>
-    </Button>
+    <!-- Full-screen side menu overlay (outside padded grid so it covers edge-to-edge) -->
+    <controls:SideMenu
+      x:Name="SideMenu"
+      LogoutClicked="OnMenuLogoutClicked"
+      DeleteAccountClicked="OnMenuDeleteAccountClicked" />
 
-    <!-- Inline copy notification (used on Windows/macOS where Toast is unavailable) -->
-    <Border
-      x:Name="CopiedBanner"
-      IsVisible="False"
-      Opacity="0"
-      HorizontalOptions="Center"
-      VerticalOptions="Start"
-      Margin="0,16,0,0"
-      BackgroundColor="#1E293B"
-      StrokeThickness="0"
-      StrokeShape="RoundRectangle 8"
-      Padding="18,10"
-    >
-      <Label
-        x:Name="CopiedBannerLabel"
-        TextColor="White"
-        FontSize="14"
-      />
-    </Border>
   </Grid>
 </ContentPage>

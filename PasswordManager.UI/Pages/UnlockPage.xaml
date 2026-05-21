@@ -1,67 +1,86 @@
-﻿<ContentPage
+<ContentPage
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:controls="clr-namespace:PasswordManager.UI.Controls"
   x:Class="PasswordManager.UI.UnlockPage"
   BackgroundColor="{StaticResource BackgroundColor}"
   Shell.NavBarIsVisible="False"
 >
-    <Grid x:Name="Root"  InputTransparent="{Binding IsBusy}">
-    <!-- Main Content -->
-    <Grid Padding="24">
-      <!-- Logout -->
-      <Button x:Name="LogoutButton" Text="Logout" Style="{StaticResource LogoutButtonStyle}" Clicked="OnLogoutClicked" />
-
-      <!-- Main -->
-      <VerticalStackLayout
-        Spacing="22"
-        VerticalOptions="Center"
-        HorizontalOptions="Center"
-        WidthRequest="300"
-        MaximumWidthRequest="600"
-        IsEnabled="{Binding CanUnlock}"
-      >
-        <!-- Header -->
-        <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
-          <Label x:Name="TitleLabel" Text="Unlock Vault" Style="{StaticResource PrimaryLabelStyle}" />
-
-          <Label x:Name="SubtitleLabel" Text="Enter your master password" Style="{StaticResource SecondaryLabelStyle}" />
-        </VerticalStackLayout>
-
-        <!-- Password field -->
-        <Border
-          BackgroundColor="{StaticResource SurfaceColor}"
-          StrokeThickness="0"
-          StrokeShape="RoundRectangle 10"
-          Padding="18,10"
-          HorizontalOptions="Fill"
-        >
-          <Entry
-            x:Name="MasterPasswordEntry"
-            Placeholder="Master password"
-            Style="{StaticResource PrimaryEntryStyle}"
-            IsPassword="True"
-            HeightRequest="40"
-            FontSize="16"
-          />
-        </Border>
-
-        <!-- Unlock button -->
-        <Button
-          x:Name="UnlockButton"
-          Text="Unlock"
-          Style="{StaticResource PrimaryButtonStyle}"
-          Clicked="OnUnlockClicked"
-          SemanticProperties.Description="Unlock your password vault."
+  <!-- Outer grid: no padding so the SideMenu overlay covers the full screen -->
+  <Grid>
+    <Grid x:Name="Root" InputTransparent="{Binding IsBusy}">
+      <!-- Main Content -->
+      <Grid Padding="24">
+        <!-- Settings button (replaces Logout — same position: top-right) -->
+        <ImageButton
+          x:Name="SettingsButton"
+          Source="icn_settings.svg"
+          HeightRequest="38"
+          WidthRequest="38"
+          HorizontalOptions="End"
+          VerticalOptions="Start"
+          Clicked="OnSettingsClicked"
+            BackgroundColor="Transparent"
         />
 
-        <!-- Status -->
-        <Label x:Name="StatusLabel" Style="{StaticResource StatusLabelStyle}" />
-      </VerticalStackLayout>
+        <!-- Main -->
+        <VerticalStackLayout
+          Spacing="22"
+          VerticalOptions="Center"
+          HorizontalOptions="Center"
+          WidthRequest="300"
+          MaximumWidthRequest="600"
+          IsEnabled="{Binding CanUnlock}"
+        >
+          <!-- Header -->
+          <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+            <Label x:Name="TitleLabel" Text="Unlock Vault" Style="{StaticResource PrimaryLabelStyle}" />
+            <Label x:Name="SubtitleLabel" Text="Enter your master password" Style="{StaticResource SecondaryLabelStyle}" />
+          </VerticalStackLayout>
+
+          <!-- Password field -->
+          <Border
+            BackgroundColor="{StaticResource SurfaceColor}"
+            StrokeThickness="0"
+            StrokeShape="RoundRectangle 10"
+            Padding="18,10"
+            HorizontalOptions="Fill"
+          >
+            <Entry
+              x:Name="MasterPasswordEntry"
+              Placeholder="Master password"
+              Style="{StaticResource PrimaryEntryStyle}"
+              IsPassword="True"
+              HeightRequest="40"
+              FontSize="16"
+            />
+          </Border>
+
+          <!-- Unlock button -->
+          <Button
+            x:Name="UnlockButton"
+            Text="Unlock"
+            Style="{StaticResource PrimaryButtonStyle}"
+            Clicked="OnUnlockClicked"
+            SemanticProperties.Description="Unlock your password vault."
+          />
+
+          <!-- Status -->
+          <Label x:Name="StatusLabel" Style="{StaticResource StatusLabelStyle}" />
+        </VerticalStackLayout>
+      </Grid>
+
+      <!-- Loading Overlay -->
+      <Grid x:Name="LoadingOverlay" Style="{StaticResource ActivityOverlayStyle}">
+        <ActivityIndicator IsRunning="True" Style="{StaticResource ActivityIndicatorStyle}" />
+      </Grid>
     </Grid>
 
-    <!-- Overlay -->
-    <Grid x:Name="LoadingOverlay" Style="{StaticResource ActivityOverlayStyle}">
-      <ActivityIndicator IsRunning="True" Style="{StaticResource ActivityIndicatorStyle}" />
-    </Grid>
+    <!-- Full-screen side menu overlay (outside Root so IsBusy doesn't block it) -->
+    <controls:SideMenu
+      x:Name="SideMenu"
+      LogoutClicked="OnMenuLogoutClicked"
+      DeleteAccountClicked="OnMenuDeleteAccountClicked" />
+
   </Grid>
 </ContentPage>

@@ -6,6 +6,8 @@ using PasswordManager.Core.Services;
 using PasswordManager.UI.Services;
 using Microsoft.Maui.Platform;
 using Microsoft.Maui.Controls.Platform;
+using Android.OS;
+
 
 #if ANDROID
 using Android.Content.Res;
@@ -90,7 +92,31 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<CommandDispatcher>();
 
-    SearchBarHandler.Mapper.AppendToMapping("RemoveUnderline", (handler, view) =>
+        /*Styling*/
+
+#if ANDROID
+        ImageButtonHandler.Mapper.AppendToMapping("RemoveRipple", (handler, view) =>
+        {
+            handler.PlatformView.Post(() =>
+            {
+                var nativeButton = handler.PlatformView;
+
+                nativeButton.Foreground = null;
+                nativeButton.Background = null;
+                nativeButton.StateListAnimator = null;
+
+                nativeButton.SetBackgroundColor(Android.Graphics.Color.Transparent);
+
+                nativeButton.BackgroundTintList =
+                    Android.Content.Res.ColorStateList.ValueOf(
+                        Android.Graphics.Color.Transparent);
+
+                nativeButton.SetPadding(0, 0, 0, 0);
+            });
+        });
+#endif
+
+        SearchBarHandler.Mapper.AppendToMapping("RemoveUnderline", (handler, view) =>
     {
     #if ANDROID
         var searchView = handler.PlatformView;

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="PasswordManager.UI.Controls.AppHeader"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Name="self">
+
+    <Grid BackgroundColor="{StaticResource HeaderColor}">
+        <Grid.RowDefinitions>
+            <!-- Absorbs the Android status bar so content sits below it -->
+            <RowDefinition Height="{OnPlatform Android=28, Default=0}" />
+            <RowDefinition Height="56" />
+        </Grid.RowDefinitions>
+
+        <!-- Row 0: status bar spacer (empty, just carries the background colour) -->
+
+        <!-- Row 1: header content -->
+        <Grid Grid.Row="1" ColumnDefinitions="56,*,56">
+
+            <ImageButton
+                Grid.Column="0"
+                Source="icn_back.svg"
+                IsVisible="{Binding ShowBackButton, Source={x:Reference self}}"
+                Clicked="OnBackClicked"
+                HeightRequest="28"
+                WidthRequest="28"
+                VerticalOptions="Center"
+                HorizontalOptions="Center" />
+
+            <Label
+                Grid.Column="1"
+                Text="{Binding Title, Source={x:Reference self}}"
+                TextColor="{StaticResource PrimaryTextColor}"
+                FontSize="18"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+
+            <ImageButton
+                Grid.Column="2"
+                Source="icn_menu.svg"
+                Clicked="OnMenuClicked"
+                HeightRequest="28"
+                WidthRequest="28"
+                VerticalOptions="Center"
+                HorizontalOptions="Center" />
+
+        </Grid>
+    </Grid>
+</ContentView>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="PasswordManager.UI.Controls.SideMenu"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    IsVisible="False">
+
+    <Grid>
+
+        <!-- Full-screen transparent backdrop: tap anywhere outside the panel to close -->
+        <BoxView Color="Transparent">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnBackdropTapped" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+        <!--
+            Corner panel: anchored top-right, auto-height to content.
+            AnchorX/AnchorY set the scale origin to the top-right corner
+            so the open/close animation expands from where the settings button is.
+        -->
+        <Border
+            x:Name="MenuPanel"
+            HorizontalOptions="End"
+            VerticalOptions="Start"
+            WidthRequest="252"
+            Margin="0,68,12,0"
+            BackgroundColor="{StaticResource SurfaceColor}"
+            StrokeThickness="0"
+            StrokeShape="RoundRectangle 14"
+            AnchorX="1"
+            AnchorY="0"
+            Scale="0"
+            Opacity="0">
+
+            <Border.Shadow>
+                <Shadow Brush="Black" Opacity="0.45" Radius="24" Offset="0,4" />
+            </Border.Shadow>
+
+            <!-- Inner layout swallows taps so they don't reach the backdrop -->
+            <VerticalStackLayout Spacing="0">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnPanelTapped" />
+                </VerticalStackLayout.GestureRecognizers>
+
+                <!-- Header -->
+                <Grid BackgroundColor="{StaticResource SurfaceColor}" Padding="20,20,20,16">
+                    <Label
+                        Text="Settings"
+                        TextColor="{StaticResource PrimaryTextColor}"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        HorizontalOptions="Start" />
+                </Grid>
+
+                <!-- White divider -->
+                <BoxView HeightRequest="1" BackgroundColor="White" Margin="10,0" />
+
+                <!-- Buttons -->
+                <VerticalStackLayout Spacing="10" Padding="14,14,14,14">
+
+                    <!-- Logout -->
+                    <Border
+                        BackgroundColor="{StaticResource BackgroundColor}"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 10"
+                        HeightRequest="52">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnLogoutClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="12" Padding="14,0" VerticalOptions="Center">
+                            <Image
+                                Source="icn_logout.svg"
+                                HeightRequest="18"
+                                WidthRequest="18"
+                                VerticalOptions="Center" />
+                            <Label
+                                Text="Logout"
+                                TextColor="{StaticResource PrimaryTextColor}"
+                                FontSize="15"
+                                VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Delete Account -->
+                    <Border
+                        BackgroundColor="#3B1F1F"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 10"
+                        HeightRequest="46">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnDeleteAccountClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="12" Padding="14,0" VerticalOptions="Center">
+                            <Image
+                                Source="icn_delete.svg"
+                                HeightRequest="18"
+                                WidthRequest="18"
+                                VerticalOptions="Center" />
+                            <Label
+                                Text="Delete Account"
+                                TextColor="{StaticResource DangerColor}"
+                                FontSize="15"
+                                VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Border>
+
+    </Grid>
+</ContentView>
